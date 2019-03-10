@@ -8,12 +8,12 @@ const app = express();
 // Initialize Firebase
 // edit this b/c we need a new firebase
 const config = {
-    apiKey: "AIzaSyCRM49rUHIc6Qv_30xmz6elzunzr_qxH-0",
-    authDomain: "homebuddy-4573e.firebaseapp.com",
-    databaseURL: "https://homebuddy-4573e.firebaseio.com",
-    projectId: "homebuddy-4573e",
-    storageBucket: "homebuddy-4573e.appspot.com",
-    messagingSenderId: "508290220635"
+    apiKey: "AIzaSyBtYCRExBERnTmIOWOA5MLhko93oi_7I88",
+    authDomain: "emailtest-c5931.firebaseapp.com",
+    databaseURL: "https://emailtest-c5931.firebaseio.com",
+    projectId: "emailtest-c5931",
+    storageBucket: "emailtest-c5931.appspot.com",
+    messagingSenderId: "775804973647"
 };
 firebase.initializeApp(config);
 
