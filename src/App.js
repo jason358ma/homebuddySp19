@@ -19,7 +19,7 @@ export class MapContainer extends Component {
         selectedPlace: {}
     };
 
-    onMarkerClick = (props, marker, m2, e) =>
+    onMarkerClick = (props, marker, e) =>
         this.setState({
             selectedPlace: props,
             activeMarker: marker,
@@ -41,15 +41,6 @@ export class MapContainer extends Component {
           height: '100%'
         };
         return (
-            // <Map
-            //     google={this.props.google}
-            //     style={styles}
-            //     zoom = {14}
-            //     // initialCenter={{
-            //     //     lat: 37.871295,
-            //     //     lng: -122.260314
-            //     // }}
-            // >
 
             <CurrentLocation centerAroundCurrentLocation google={this.props.google}>
                 <Marker
@@ -59,10 +50,10 @@ export class MapContainer extends Component {
 
                 <Marker
                 // onClick={this.onMarkerClick}
-                // name={'Test Marker'}
+                // name={'Destination'}
                 // position={{
-                //     lat: 37.875,
-                //     lng: -122.260314
+                //     lat: 37.868112,
+                //     lng: -122.255033
                 // }}
                 />
 
