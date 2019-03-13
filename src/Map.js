@@ -1,5 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
+//test
 
 const mapStyles = {
   map: {
@@ -8,28 +9,18 @@ const mapStyles = {
     height: '100%'
   }
 };
-
-export class Map extends React.Component {
+export class CurrentLocation extends React.Component {
   constructor(props) {
     super(props);
 
     const { lat, lng } = this.props.initialCenter;
-
-    const directionsService = new this.props.google.maps.DirectionsService();
-    const directionsDisplay = new this.props.google.maps.DirectionsRenderer();
-    const searchBox = new this.props.google.maps.places.SearchBox();
-
     this.state = {
       currentLocation: {
         lat: lat,
         lng: lng
-      },
-      directionsService : directionsService,
-      directionsDisplay : directionsDisplay,
-      searchBox : searchBox,
+      }
     };
   }
-
   componentDidMount() {
     if (this.props.centerAroundCurrentLocation) {
       if (navigator && navigator.geolocation) {
@@ -41,11 +32,10 @@ export class Map extends React.Component {
               lng: coords.longitude
             }
           });
-          this.loadMap()
         });
       }
     }
-    // this.loadMap();
+    this.loadMap();
   }
 
   componentDidUpdate(prevProps, prevState) {
@@ -69,8 +59,7 @@ export class Map extends React.Component {
       const node = ReactDOM.findDOMNode(mapRef);
 
       let { zoom } = this.props;
-      let { lat, lng } = this.state.currentLocation;
-    //   console.log(lat, lng);
+      const { lat, lng } = this.state.currentLocation;
       const center = new maps.LatLng(lat, lng);
       const mapConfig = Object.assign(
         {},
@@ -81,31 +70,8 @@ export class Map extends React.Component {
       );
       // maps.Map() is constructor that instantiates the map
       this.map = new maps.Map(node, mapConfig);
-      this.state.directionsDisplay.setMap(this.map);
-      let destination = { //unit 1
-        lat: 37.868112,
-        lng: -122.255033
-      }
-      this.displayRoute(destination);
     }
   }
-
-  displayRoute(destination) { //display route from current location to specified destination\
-    this.state.directionsService.route({
-        origin: new this.props.google.maps.LatLng(this.state.currentLocation.lat, this.state.currentLocation.lng),
-        destination: new this.props.google.maps.LatLng(destination.lat, destination.lng),
-        travelMode: this.props.google.maps.TravelMode['WALKING']
-        }, (response, status) => {
-            if (status === 'OK') {
-                console.log(this.state.currentLocation);
-                this.state.directionsDisplay.setDirections(response);
-
-            } else {
-                window.alert('Directions request failed due to: ' + status);
-            }
-        })
-  }
-
 
   recenterMap() {
     const map = this.map;
@@ -136,7 +102,6 @@ export class Map extends React.Component {
   }
 
   render() {
-    // console.log(this.props);
     const style = Object.assign({}, mapStyles.map);
 
     return (
@@ -149,14 +114,14 @@ export class Map extends React.Component {
     );
   }
 }
-export default Map;
+export default CurrentLocation;
 
-Map.defaultProps = {
+CurrentLocation.defaultProps = {
   zoom: 14,
   initialCenter: {
     lat: 37.871295,
     lng: -122.260314
   },
-  centerAroundCurrentLocation: true,
+  centerAroundCurrentLocation: false,
   visible: true
 };
