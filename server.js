@@ -5,8 +5,7 @@ const firebase = require("firebase");
 const path = require('path');
 const port = process.env.PORT || 8080;
 const app = express();
-// Initialize Firebase
-// edit this b/c we need a new firebase
+
 const config = {
     apiKey: "AIzaSyBtYCRExBERnTmIOWOA5MLhko93oi_7I88",
     authDomain: "emailtest-c5931.firebaseapp.com",
@@ -17,7 +16,13 @@ const config = {
 };
 firebase.initializeApp(config);
 
+app.listen(port);
+
 const database = firebase.database();
+
+const bodyParser = require('body-parser');
+app.use(bodyParser.json()); // support json encoded bodies
+app.use(bodyParser.urlencoded({ extended: true }));
 
 app.use(favicon(__dirname + '/build/favicon.ico'));
 // the __dirname is the current directory from where the script is running
@@ -28,10 +33,14 @@ app.get('/ping', function (req, res) {
     return res.send('pong');
 });
 app.post('/post', function (req, res) {
-    database.ref('testUser').set({
-        username: 'testname',
-        email: 'test@test.com',
-        profile_picture : 'google.com'
+    database.ref('users').set({
+        // https://scotch.io/tutorials/use-expressjs-to-get-url-and-post-parameters
+        age: req.body.age,
+        email: req.body.email,
+        firstname: req.body.firstname,
+        lastname: req.body.lastname,
+        password: req.body.password,
+        username: req.body.username
     }, function (error) {
         if (error) {
             return res.send('post failed! Error is:' + error);
@@ -41,11 +50,10 @@ app.post('/post', function (req, res) {
     });
     // return res.send('post request');
 });
-app.get('/test', function (req, res) {
-    return res.send({'test': 'test message here!'});
-});
-app.get('/', function (req, res) {
-    console.log('GET root');
-    res.sendFile(path.join(__dirname, 'build', 'index.html'));
-});
-app.listen(port);
+// app.get('/test', function (req, res) {
+//     return res.send({'test': 'test message here!'});
+// });
+// app.get('/', function (req, res) {
+//     console.log('GET root');
+//     res.sendFile(path.join(__dirname, 'build', 'index.html'));
+// });
