@@ -67,7 +67,7 @@ app.post('/signup', function(req, res) {
         if (user) {
             // User is signed in.
             let uid = user.uid;
-            createChild(uid);
+            createChild(uid, req.body.firstName, req.body.lastName);
         } else {
             // No user is signed in.
         }
@@ -120,16 +120,10 @@ app.post("/passwordReset", function(req, res) {
     });
 });
 // TODO: Figure out how to have frontend send start and dest coordinates to be stored in user data on backend (HTTPS POST request?)
-app.post('/post', function (req, res) {
+app.post('/coordinates', function (req, res) {
     const ref = database.ref('users');
     const uid = auth.currentUser.uid;
     ref.child(uid).set({
-        // https://scotch.io/tutorials/use-expressjs-to-get-url-and-post-parameters
-        age: req.body.age,
-        // email: req.body.email, //on firebase auth
-        firstName: req.body.firstName,
-        lastName: req.body.lastName,
-        // username: req.body.username, //on firebase auth
         startLat: req.body.startLat,
         startLong: req.body.startLong,
         destLat: req.body.destLat,
