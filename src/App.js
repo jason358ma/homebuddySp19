@@ -6,6 +6,7 @@ import './App.css';
 import { Map, GoogleApiWrapper } from 'google-maps-react';
 import { InfoWindow, Marker } from 'google-maps-react';
 import CurrentLocation from './Map';
+import Places from 'google-maps-react';
 
 
 import ReactDOM from 'react-dom';
@@ -36,45 +37,85 @@ export class MapContainer extends Component {
     }
 
     render() {
-        const styles = {
-          width: '100%',
-          height: '100%'
-        };
+
         return (
-
+            <div>
             <CurrentLocation centerAroundCurrentLocation google={this.props.google}>
-                <Marker
-                onClick={this.onMarkerClick}
-                name={'current location'}
-                />
-
-                <Marker
-                // onClick={this.onMarkerClick}
-                // name={'Destination'}
-                // position={{
-                //     lat: 37.868112,
-                //     lng: -122.255033
-                // }}
-                />
-
-                <InfoWindow
-                  marker={this.state.activeMarker}
-                  visible={this.state.showingInfoWindow}
-                  onClose={this.onClose}
-                >
-                    <div>
-                        <h2>{this.state.selectedPlace.name}</h2>
-                  </div>
-                </InfoWindow>
-
             </CurrentLocation>
-
-            // </Map>
+            </div>
         );
     }
 }
 
 export default GoogleApiWrapper({
-  // apiKey: 'AIzaSyAyesbQMyKVVbBgKVi2g6VX7mop2z96jBo'
   apiKey: 'AIzaSyDfaCamdV4CSw1jBTG8NZeem0YG6kguM3s'
 })(MapContainer);
+
+
+
+
+
+
+
+
+
+
+
+// ha what is going on??
+
+
+
+class App extends Component {
+
+    constructor(props) {
+        super(props)
+        this.state = {username: '', password: ''}
+
+        this.handleChangePW = this.handleChange.bind(this);
+        this.handleChangeUS = this.handleChange.bind(this);
+
+        this.submitChange = this.handleSubmit.bind(this);
+    }
+
+    handleChangeUS(event) {
+        this.setState({username: event.target.username})
+    }
+
+    handleChangePW(event) {
+        this.setState({password: event.target.password})
+    }
+
+
+  render() {
+    return (
+
+      <div className="App">
+        <header className="App-header">
+          <img src={logo} className="App-logo" alt="logo" />
+          <p>
+            Username: <input type="text" name="username"/>
+          <br/>
+            Password: <input type="text" name="password"/>
+
+          </p>
+
+          <input type="submit" value="Submit" />
+          <a
+            className="App-link"
+            href="https://reactjs.org"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Learn React
+          </a>
+        </header>
+      </div>
+    );
+  }
+}
+
+// App.defaultProps = {
+//     username="username",
+//     password="password"
+// }
+// export default App

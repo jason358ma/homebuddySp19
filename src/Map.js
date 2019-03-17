@@ -1,13 +1,26 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
+import axios from 'axios'
+
 
 const mapStyles = {
-  map: {
-    position: 'absolute',
-    width: '100%',
-    height: '100%'
-  }
+    map: {
+        position: 'absolute',
+        width: '100%',
+        height: '100%'
+    },
 };
+
+const searchboxStyles = {
+    position: 'absolute',
+    width: '30%'
+}
+
+class searchBox extends React.Component {
+    constructor(props) {
+
+    }
+}
 
 export class Map extends React.Component {
   constructor(props) {
@@ -17,7 +30,9 @@ export class Map extends React.Component {
 
     const directionsService = new this.props.google.maps.DirectionsService();
     const directionsDisplay = new this.props.google.maps.DirectionsRenderer();
-    const searchBox = new this.props.google.maps.places.SearchBox();
+    // const searchBox = new this.props.google.maps.places.SearchBox();
+    var searchBox = new this.props.google.maps.places.SearchBox(document.getElementById('pac-input'));
+
 
     this.state = {
       currentLocation: {
@@ -29,6 +44,7 @@ export class Map extends React.Component {
       searchBox : searchBox,
     };
   }
+
 
   componentDidMount() {
     if (this.props.centerAroundCurrentLocation) {
@@ -45,7 +61,6 @@ export class Map extends React.Component {
         });
       }
     }
-    // this.loadMap();
   }
 
   componentDidUpdate(prevProps, prevState) {
@@ -87,6 +102,37 @@ export class Map extends React.Component {
         lng: -122.255033
       }
       this.displayRoute(destination);
+
+
+      var input = document.getElementById('pac-input');
+      var searchBox = google.maps.places.SearchBox(input)
+      this.map.controls[google.maps.ControlPosition.TOP_LEFT].push(input);
+      var markers = [];
+    //   searchBox.addListener('places_changed', function() {
+    //       var places = searchBox.getPlaces();
+    //       if (places.length == 0) {
+    //           return;
+    //       }
+    //       markers.forEach(function(marker) {
+    //           marker.setMap(null);
+    //       });
+    //       markers = [];
+    //       var bounds = google.LatLngBounds();
+    //       places.forEach(function(place) {
+    //           if (!place.geometry) {
+    //             console.log("Returned place contains no geometry");
+    //             return;
+    //           }
+    //           var icon = {
+    //               url: place.icon,
+    //               size: google.maps.Size(71, 71),
+    //               origin: google.maps.Point(0, 0),
+    //               anchor: google.maps.Point(17, 34),
+    //               scaledSize: google.maps.Size(25, 25)
+    //           }
+    //       })
+      //
+    //   });
     }
   }
 
@@ -120,10 +166,12 @@ export class Map extends React.Component {
     }
   }
 
+
   renderChildren() {
     const { children } = this.props;
 
     if (!children) return;
+
 
     return React.Children.map(children, c => {
       if (!c) return;
@@ -141,6 +189,10 @@ export class Map extends React.Component {
 
     return (
       <div>
+          <div>
+            <input id="pac-input" class="controls" type="text" placeholder="Search Box"/>
+          </div>
+
         <div style={style} ref="map">
           Loading map...
         </div>
@@ -150,6 +202,7 @@ export class Map extends React.Component {
   }
 }
 export default Map;
+
 
 Map.defaultProps = {
   zoom: 14,
