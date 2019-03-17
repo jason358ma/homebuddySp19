@@ -34,22 +34,6 @@ app.get('/ping', function (req, res) {
     return res.send('pong');
 });
 
-// Sign in
-app.post('/signin', function(req, res) {
-    firebase.auth().signInWithEmailAndPassword(req.body.email, req.body.password).catch(function(error) {
-        // Handle Errors here.
-        const errorCode = error.code;
-        const errorMessage = error.message;
-        // [START_EXCLUDE]
-        if (errorCode === 'auth/wrong-password') {
-            res.send('Wrong password.');
-        } else {
-            res.send(errorMessage);
-        }
-    });
-});
-
-// TODO: design and set up account structures in Firebase
 // Sign up
 function createChild(uid, firstName, lastName) {
     const database = firebase.database();
@@ -89,6 +73,22 @@ app.post('/signup', function(req, res) {
         }
     });
 });
+
+// Sign in
+app.post('/signin', function(req, res) {
+    firebase.auth().signInWithEmailAndPassword(req.body.email, req.body.password).catch(function(error) {
+        // Handle Errors here.
+        const errorCode = error.code;
+        const errorMessage = error.message;
+        // [START_EXCLUDE]
+        if (errorCode === 'auth/wrong-password') {
+            res.send('Wrong password.');
+        } else {
+            res.send(errorMessage);
+        }
+    });
+});
+
 // Send email verification
 app.post("/emailVerify", function(req, res) {
     firebase.auth().currentUser.sendEmailVerification().then(function() {
@@ -155,5 +155,6 @@ app.get('/test', function (req, res) {
 //     res.sendFile(path.join(__dirname, 'build', 'index.html'));
 // });
 // TODO: Come up with an algorithm for matching HomeBuddies Basic algorithm: between users A and B, find min(dist(locationA, locationB) + dist(destA, destB))
+
 // TODO: Implement the basic algorithm into the services to create pairings
 app.listen(port);
