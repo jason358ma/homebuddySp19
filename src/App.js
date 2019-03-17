@@ -47,9 +47,9 @@ export class MapContainer extends Component {
     }
 }
 
-export default GoogleApiWrapper({
-  apiKey: 'AIzaSyDfaCamdV4CSw1jBTG8NZeem0YG6kguM3s'
-})(MapContainer);
+// export default GoogleApiWrapper({
+//   apiKey: 'AIzaSyDfaCamdV4CSw1jBTG8NZeem0YG6kguM3s'
+// })(MapContainer);
 
 
 
@@ -65,57 +65,55 @@ export default GoogleApiWrapper({
 
 
 
-class App extends Component {
+class Signup extends Component {
 
     constructor(props) {
-        super(props)
-        this.state = {username: '', password: ''}
+      super(props);
+      this.state = {username: 'u', password: 'p'};
 
-        this.handleChangePW = this.handleChange.bind(this);
-        this.handleChangeUS = this.handleChange.bind(this);
-
-        this.submitChange = this.handleSubmit.bind(this);
+      this.handleChange = this.handleChange.bind(this);
+      this.submitClicked= this.submitClicked.bind(this);
     }
 
-    handleChangeUS(event) {
-        this.setState({username: event.target.username})
+    handleChange(event) {
+        if (event.target.id === "password") {
+            this.setState({password: event.target.value});
+        } else {
+            this.setState({username: event.target.value});
+        }
+        console.log(event.target.id)
     }
 
-    handleChangePW(event) {
-        this.setState({password: event.target.password})
+    submitClicked = () => {
+        alert('submit clicked!')
+        console.log(this.state)
     }
-
 
   render() {
     return (
-
       <div className="App">
         <header className="App-header">
           <img src={logo} className="App-logo" alt="logo" />
-          <p>
-            Username: <input type="text" name="username"/>
+
+            <label> Username:
+            <input type="text" id="username" username={this.state.username} onChange={this.handleChange} />
+          </label>
+
+          <label> Password:
+          <input type="text" id="password" password={this.state.password} onChange={this.handleChange} />
+          </label>
           <br/>
-            Password: <input type="text" name="password"/>
+          <input type="submit" username="Submit" onClick={this.submitClicked}/>
 
-          </p>
-
-          <input type="submit" value="Submit" />
-          <a
-            className="App-link"
-            href="https://reactjs.org"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Learn React
-          </a>
         </header>
       </div>
     );
   }
 }
 
-// App.defaultProps = {
-//     username="username",
-//     password="password"
-// }
-// export default App
+Signup.defaultProps = {
+    value: '',
+    username: "username",
+    password: "password"
+}
+export default Signup
