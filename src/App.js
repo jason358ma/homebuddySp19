@@ -7,6 +7,7 @@ import { Map, GoogleApiWrapper } from 'google-maps-react';
 import { InfoWindow, Marker } from 'google-maps-react';
 import CurrentLocation from './Map';
 import Places from 'google-maps-react';
+import axios from 'axios';
 
 
 import ReactDOM from 'react-dom';
@@ -69,7 +70,7 @@ class Signup extends Component {
 
     constructor(props) {
       super(props);
-      this.state = {username: 'u', password: 'p'};
+      this.state = {username: 'u', password: 'p', first: 'f', last: 'l'};
 
       this.handleChange = this.handleChange.bind(this);
       this.submitClicked= this.submitClicked.bind(this);
@@ -79,7 +80,11 @@ class Signup extends Component {
         if (event.target.id === "password") {
             this.setState({password: event.target.value});
         } else {
-            this.setState({username: event.target.value});
+            this.setState({
+                username: event.target.value,
+                first: event.target.value,
+                last: event.target.value
+            });
         }
         console.log(event.target.id)
     }
@@ -87,6 +92,13 @@ class Signup extends Component {
     submitClicked = () => {
         alert('submit clicked!')
         console.log(this.state)
+
+        axios.post("/signup", {
+            email: this.state.username,
+            password: this.state.password,
+            firstName: this.state.first,
+            lastName: this.state.last
+        })
     }
 
   render() {
@@ -102,6 +114,14 @@ class Signup extends Component {
           <label> Password:
           <input type="text" id="password" password={this.state.password} onChange={this.handleChange} />
           </label>
+
+          <label> First:
+          <input type="text" id="username" first={this.state.first} onChange={this.handleChange} />
+        </label>
+
+        <label> Last:
+        <input type="text" id="username" last={this.state.last} onChange={this.handleChange} />
+      </label>
           <br/>
           <input type="submit" username="Submit" onClick={this.submitClicked}/>
 
