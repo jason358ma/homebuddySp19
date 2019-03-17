@@ -4,9 +4,14 @@
   "private": true,
   "dependencies": {
     "body-parser": "^1.18.3",
+    "express": "latest",
+    "firebase": "^5.9.0",
+    "node": "latest",
     "react": "^16.8.3",
     "react-dom": "^16.8.3",
-    "react-scripts": "2.1.5"
+    "react-scripts": "2.1.5",
+    "request": "latest",
+    "serve-favicon": "^2.5.0"
   },
   "scripts": {
     "start": "react-scripts start",
