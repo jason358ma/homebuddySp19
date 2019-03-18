@@ -101,7 +101,7 @@ class Signup extends Component {
         }).then(response => {
             console.log(response.data);
         })
-    }l
+    }
 
   render() {
     return (
