@@ -98,8 +98,10 @@ class Signup extends Component {
             password: this.state.password,
             firstName: this.state.first,
             lastName: this.state.last
+        }).then(response => {
+            console.log(response.data);
         })
-    }
+    }l
 
   render() {
     return (
