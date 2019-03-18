@@ -77,14 +77,18 @@ class Signup extends Component {
     }
 
     handleChange(event) {
-        if (event.target.id === "password") {
-            this.setState({password: event.target.value});
-        } else {
-            this.setState({
-                username: event.target.value,
-                first: event.target.value,
-                last: event.target.value
-            });
+        switch (event.target.id) {
+            case "username":
+                this.setState({username: event.target.value});
+                break;
+            case "password":
+                this.setState({password: event.target.value});
+                break;
+            case "first":
+                this.setState({first: event.target.value});
+                break;
+            case "last":
+                this.setState({last: event.target.value});
         }
         console.log(event.target.id)
     }
@@ -118,11 +122,11 @@ class Signup extends Component {
           </label>
 
           <label> First:
-          <input type="text" id="username" first={this.state.first} onChange={this.handleChange} />
+          <input type="text" id="first" first={this.state.first} onChange={this.handleChange} />
         </label>
 
         <label> Last:
-        <input type="text" id="username" last={this.state.last} onChange={this.handleChange} />
+        <input type="text" id="last" last={this.state.last} onChange={this.handleChange} />
       </label>
           <br/>
           <input type="submit" username="Submit" onClick={this.submitClicked}/>
