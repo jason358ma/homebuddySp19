@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import logo from './logo.svg';
 import './App.css';
+import { BrowserRouter as Router, Route, Link } from "react-router-dom";
+import MapContainer from './MapContainer.js'
 
 // import {GoogleApiComponent} from 'google-maps-react';
 import { Map, GoogleApiWrapper } from 'google-maps-react';
@@ -9,62 +11,8 @@ import CurrentLocation from './Map';
 import Places from 'google-maps-react';
 import axios from 'axios';
 
-
 import ReactDOM from 'react-dom';
 // import * as ReactDOM from 'react-dom'
-
-export class MapContainer extends Component {
-
-    state = {
-        showingInfoWindow: false,
-        activeMarker: {},
-        selectedPlace: {}
-    };
-
-    onMarkerClick = (props, marker, e) =>
-        this.setState({
-            selectedPlace: props,
-            activeMarker: marker,
-            showingInfoWindow: true
-        });
-
-    onClose = props => {
-        if (this.state.showingInfoWindow === true) {
-            this.setState({
-                showingInfoWindow: false,
-                activeMarker: null,
-            });
-        }
-    }
-
-    render() {
-
-        return (
-            <div>
-            <CurrentLocation centerAroundCurrentLocation google={this.props.google}>
-            </CurrentLocation>
-            </div>
-        );
-    }
-}
-
-// export default GoogleApiWrapper({
-//   apiKey: 'AIzaSyDfaCamdV4CSw1jBTG8NZeem0YG6kguM3s'
-// })(MapContainer);
-
-
-
-
-
-
-
-
-
-
-
-// ha what is going on??
-
-
 
 class Signup extends Component {
 
@@ -107,8 +55,15 @@ class Signup extends Component {
         })
     }
 
+    loginClicked = () => {
+      // export default GoogleApiWrapper({
+      //   apiKey: 'AIzaSyDfaCamdV4CSw1jBTG8NZeem0YG6kguM3s'
+      // })(MapContainer);
+    }
+
   render() {
     return (
+      <Router>
       <div className="App">
         <header className="App-header">
           <img src={logo} className="App-logo" alt="logo" />
@@ -130,9 +85,13 @@ class Signup extends Component {
       </label>
           <br/>
           <input type="submit" username="Submit" onClick={this.submitClicked}/>
-
+            <Link to="/Map">
+              <button username="login" onClick={this.loginClicked}>LOGIN</button>
+            </Link>
+            <Route path="/Map/" component={MapContainer} />
         </header>
       </div>
+      </Router>
     );
   }
 }
