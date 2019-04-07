@@ -20,11 +20,6 @@ const database = firebase.database();
 const auth = firebase.auth();
 app.use(express.json());
 
-// body-parser already included in express (https://stackoverflow.com/questions/11625519/how-to-access-the-request-body-when-posting-using-node-js-and-express)
-// const bodyParser = require('body-parser');
-// app.use(bodyParser.json()); // support json encoded bodies
-// app.use(bodyParser.urlencoded({ extended: true }));
-
 app.use(favicon(__dirname + '/build/favicon.ico'));
 // the __dirname is the current directory from where the script is running
 app.use(express.static(__dirname));
@@ -138,6 +133,50 @@ app.post('/coordinates', function (req, res) {
     // return res.send('post request');
 });
 
+function getDist(lat_A, long_A, lat_B, long_B) {
+
+}
+
+app.post('/findBuddy', function(req, res) {
+    const pool = database.ref('pool');
+    const myUid = auth.currentUser.uid;
+
+    // Assumes that user seeking buddy automatically added to pool
+    const myStartLat = pool.child(myUid).val().startLat;
+    const myStartLong = pool.child(myUid).val().startLong;
+    const myDestLat = pool.child(myUid).val().destLat;
+    const myDestLong = pool.child(myUid).val().destLong;
+
+    // Find partner in pool closest to user
+    let partnerUID = "";
+    let minDistSoFar = Number.POSITIVE_INFINITY;
+    pool.once("value").then(function(snapshot) {
+        snapshot.forEach(function(snapshot) {
+            const currPartnerUID = snapshot.key;
+            if (partnerUID !== myUid) {
+                const childData = snapshot.val();
+                const startDist = getDist(myStartLat, myStartLong, childData.startLat, childData.startLong);
+                const destDist = getDist(myDestLat, myDestLong, childData.destLat, childData.destLong);
+                const totalDist = startDist + destDist;
+                if (totalDist < minDistSoFar) {
+                    partnerUID = currPartnerUID;
+                    minDistSoFar = totalDist;
+                }
+            }
+        });
+    });
+
+    // Remove user and partner from pool
+    if (minDistSoFar !== Number.POSITIVE_INFINITY) {
+        pool.child(myUid).remove();
+        pool.child(partnerUID).remove();
+    }
+
+    // Alert the partner that they have been matched (if they are in pool, then they're waiting for partner)
+
+
+});
+
 // TODO: Firebase send personal profile info to user after logging in so that it can be displayed? (firstname, lastname, age)
 app.get('/test', function (req, res) {
     database.ref("users/" + req);
@@ -148,7 +187,7 @@ app.get('/test', function (req, res) {
 //     console.log('GET root');
 //     res.sendFile(path.join(__dirname, 'build', 'index.html'));
 // });
-// TODO: Come up with an algorithm for matching HomeBuddies Basic algorithm: between users A and B, find min(dist(locationA, locationB) + dist(destA, destB))
+// TODO: Come up with an algorithm for matching HomeBuddies Basic algorithm: between users A and B, find min(dist(locationA, locationB) + dist(destA, destB)) using Manhattan distance
 
 // TODO: Implement the basic algorithm into the services to create pairings
 app.listen(port);
