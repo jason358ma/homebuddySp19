@@ -1,20 +1,42 @@
+// pacinputimport React from 'react';
 import React from 'react';
 import ReactDOM from 'react-dom';
-import axios from 'axios'
+import axios from 'axios';
 
 
 const mapStyles = {
     map: {
         position: 'absolute',
         width: '100%',
-        height: '100%'
-    },
+        height: '100%',
+        left: '0px',
+        top: '0px'
+    }
 };
 
 const searchboxStyles = {
-    position: 'absolute',
-    width: '30%'
-}
+    searchbox: {
+        'background-color': '#ffffff',
+        position: 'absolute',
+        width: '8%',
+        height: '8%',
+        left: '0px',
+        top: '0px'
+    }
+    // searchbox: {
+    //       background-color: '#fff';
+    //       fontFamily: 'Roboto';
+    //       fontSize: '15px';
+    //       fontWeight: '300';
+    //       marginLeft: '12px';
+    //       padding: '0 11px 0 13px';
+    //     //   textOverflow: 'ellipsis';
+    //       position: 'absolute',
+    //       width: '30%'
+    //       top: '0px';
+    //       left: '0px'
+    //   }
+};
 
 class searchBox extends React.Component {
     constructor(props) {
@@ -85,7 +107,6 @@ export class Map extends React.Component {
 
       let { zoom } = this.props;
       let { lat, lng } = this.state.currentLocation;
-    //   console.log(lat, lng);
       const center = new maps.LatLng(lat, lng);
       const mapConfig = Object.assign(
         {},
@@ -97,44 +118,78 @@ export class Map extends React.Component {
       // maps.Map() is constructor that instantiates the map
       this.map = new maps.Map(node, mapConfig);
       this.state.directionsDisplay.setMap(this.map);
-      let destination = { //unit 1
-        lat: 37.868112,
-        lng: -122.255033
-      }
-      this.displayRoute(destination);
+
+
+    //   let destination = { //unit 1
+    //     lat: 37.868112,
+    //     lng: -122.255033
+    //   }
+    //   this.displayRoute(destination);
 
 
       var input = document.getElementById('pac-input');
-      var searchBox = google.maps.places.SearchBox(input)
+      var searchBox = new google.maps.places.SearchBox(input)
       this.map.controls[google.maps.ControlPosition.TOP_LEFT].push(input);
       var markers = [];
-    //   searchBox.addListener('places_changed', function() {
-    //       var places = searchBox.getPlaces();
-    //       if (places.length == 0) {
-    //           return;
-    //       }
-    //       markers.forEach(function(marker) {
-    //           marker.setMap(null);
-    //       });
-    //       markers = [];
-    //       var bounds = google.LatLngBounds();
-    //       places.forEach(function(place) {
-    //           if (!place.geometry) {
-    //             console.log("Returned place contains no geometry");
-    //             return;
-    //           }
-    //           var icon = {
-    //               url: place.icon,
-    //               size: google.maps.Size(71, 71),
-    //               origin: google.maps.Point(0, 0),
-    //               anchor: google.maps.Point(17, 34),
-    //               scaledSize: google.maps.Size(25, 25)
-    //           }
-    //       })
-      //
-    //   });
+      var destlat = 37.868112
+      var destlon = -122.255033
+    //   by default, Unit 1
+
+      searchBox.addListener('places_changed', function() {
+          var places = searchBox.getPlaces();
+          if (places.length == 0) {
+              return;
+          }
+          markers.forEach(function(marker) {
+              marker.setMap(null);
+          });
+          markers = [];
+        //   for each new place, get icon name and location
+        //   var bounds = google.LatLngBounds();
+          places.forEach(function(place) {
+              if (!place.geometry) {
+                console.log("Returned place contains no geometry");
+                return;
+              }
+              var icon = {
+                  url: place.icon,
+                  size: google.maps.Size(71, 71),
+                  origin: google.maps.Point(0, 0),
+                  anchor: google.maps.Point(17, 34),
+                  scaledSize: google.maps.Size(25, 25)
+              }
+            //   Create a marker for each place.
+              markers.push(new google.maps.Marker({
+                  map: this,
+                //   i called this.map earlier didnt work
+                  icon: icon,
+                  title: place.name,
+                  position: place.geometry.location
+              }));
+              console.log(place.geometry.location.lat())
+              console.log(place.geometry.location.lng())
+              destlat = place.geometry.location.lat()
+              destlon = place.geometry.location.lng()
+
+            //   if (place.geometry.viewport) {
+            //       // Only geocodes have viewport.
+            //       bounds.union(place.geometry.viewport);
+            //     } else {
+            //       bounds.extend(place.geometry.location);
+            //     }
+          })
+        //   this.map.fitBounds(bounds)
+
+      });
+    //   THIS IS RUN BEFORE ^^
+      let destination = { //unit 1
+        lat: destlat,
+        lng: destlon
+      }
+      this.displayRoute(destination);
+
     }
-  }
+}
 
   displayRoute(destination) { //display route from current location to specified destination\
     this.state.directionsService.route({
@@ -186,14 +241,16 @@ export class Map extends React.Component {
   render() {
     // console.log(this.props);
     const style = Object.assign({}, mapStyles.map);
+    const stylesearchbar = Object.assign({}, searchboxStyles.searchbox);
+
 
     return (
       <div>
-          <div>
-            <input id="pac-input" class="controls" type="text" placeholder="Search Box"/>
+          <div style={stylesearchbar}>
+            <input id="pac-input" class="controls" type="text" placeholder="Search box"/>
           </div>
 
-        <div style={style} ref="map">
+        <div id="map" style={style} ref="map">
           Loading map...
         </div>
         {this.renderChildren()}
