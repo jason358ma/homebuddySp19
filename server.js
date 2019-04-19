@@ -136,7 +136,7 @@ app.post('/coordinates', function (req, res) {
 });
 
 function getDist(lat_A, long_A, lat_B, long_B) {
-
+    // use haversine formula
 }
 
 setInterval(pair, 5000);
@@ -157,50 +157,41 @@ function pair() {
     });
 
     /* Pair searching users by distance*/
-    for (var myUid in searchingUsers) {
+    for (let myUid in searchingUsers) {
         if (searchingUsers.hasOwnProperty(myUid)) {
             const myStartLat = pool.child(myUid).val().startLat;
             const myStartLong = pool.child(myUid).val().startLong;
             const myDestLat = pool.child(myUid).val().destLat;
             const myDestLong = pool.child(myUid).val().destLong;
-            for (var buddyUid in searchingUsers) {
+
+            let partnerUID = "";
+            let minDistSoFar = Number.POSITIVE_INFINITY;
+            for (let buddyUid in searchingUsers) {
                 if (myUid !== buddyUid && searchingUsers[myUid].buddy == null) {
-                    if (searchingUsers.hasOwnProperty(buddyUid)) {
+                    if (searchingUsers.hasOwnProperty(buddyUid) && searchingUsers[buddyUid].buddy == null) {
                         const buddyStartLat = searchingUsers[buddyUid].startLat;
                         const buddyStartLong = searchingUsers[buddyUid].startLong;
                         const buddyDestLat = searchingUsers[buddyUid].destLat;
                         const buddyDestLong = searchingUsers[buddyUid].destLong;
-                        
+
+                        const startDist = getDist(myStartLat, myStartLong, buddyStartLat, buddyStartLong);
+                        const destDist = getDist(myDestLat, myDestLong, buddyDestLat, buddyDestLong);
+                        const totalDist = startDist + destDist;
+                        if (totalDist < minDistSoFar) {
+                            partnerUID = buddyUid;
+                            minDistSoFar = totalDist;
+                        }
                     }
                 }
             }
             // update both the dictionary and the pool
-            searchingUsers[myUid].buddy = buddyUid;
-            searchingUsers[buddyUid].buddy = myUid;
-            pool.child(myUid).val().buddy = buddyUid;
-            pool.child(buddyUid).val().buddy = myUid;
+            searchingUsers[myUid].buddy = partnerUID;
+            searchingUsers[partnerUID].buddy = myUid;
+            pool.child(myUid).val().buddy = partnerUID;
+            pool.child(partnerUID).val().buddy = myUid;
         }
     }
-
-    let partnerUID = "";
-    let minDistSoFar = Number.POSITIVE_INFINITY;
-    pool.once("value").then(function(snapshot) {
-        snapshot.forEach(function(snapshot) {
-            const currPartnerUID = snapshot.key;
-            if (partnerUID !== myUid) {
-                const childData = snapshot.val();
-                const startDist = getDist(myStartLat, myStartLong, childData.startLat, childData.startLong);
-                const destDist = getDist(myDestLat, myDestLong, childData.destLat, childData.destLong);
-                const totalDist = startDist + destDist;
-                if (totalDist < minDistSoFar) {
-                    partnerUID = currPartnerUID;
-                    minDistSoFar = totalDist;
-                }
-            }
-        });
-    });
-    return null;
-};
+}
 
 // TODO: Come up with an algorithm for matching HomeBuddies Basic algorithm: between users A and B, find min(dist(locationA, locationB) + dist(destA, destB)) using Manhattan distance
 app.post('/findBuddy', function(req, res) {
