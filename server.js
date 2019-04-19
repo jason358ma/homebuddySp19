@@ -40,7 +40,9 @@ function createChild(uid, firstName, lastName) {
         startLat: null,
         startLong: null,
         destLat: null,
-        destLong: null
+        destLong: null,
+        status: "not searching", // searching, pending, not searching
+        buddy: null
     });
 }
 
@@ -137,17 +139,83 @@ function getDist(lat_A, long_A, lat_B, long_B) {
 
 }
 
-app.post('/findBuddy', function(req, res) {
-    const pool = database.ref('pool');
-    const myUid = auth.currentUser.uid;
+setInterval(pair, 5000);
 
-    // Assumes that user seeking buddy automatically added to pool
+function pair() {
+    const pool = database.ref('users');
+
+    /* Gather all searching users */
+    let searchingUsers = {};
+    pool.once("value").then(function(snapshot) {
+        snapshot.forEach(function(snapshot) {
+            const currUID = snapshot.key;
+            const childData = snapshot.val();
+            if (childData.status === "searching") {
+                searchingUsers[currUID] = childData;
+            }
+        });
+    });
+
+    /* Pair searching users by distance*/
+    for (var myUid in searchingUsers) {
+        if (searchingUsers.hasOwnProperty(myUid)) {
+            const myStartLat = pool.child(myUid).val().startLat;
+            const myStartLong = pool.child(myUid).val().startLong;
+            const myDestLat = pool.child(myUid).val().destLat;
+            const myDestLong = pool.child(myUid).val().destLong;
+            for (var buddyUid in searchingUsers) {
+                if (myUid !== buddyUid && searchingUsers[myUid].buddy == null) {
+                    if (searchingUsers.hasOwnProperty(buddyUid)) {
+                        const buddyStartLat = searchingUsers[buddyUid].startLat;
+                        const buddyStartLong = searchingUsers[buddyUid].startLong;
+                        const buddyDestLat = searchingUsers[buddyUid].destLat;
+                        const buddyDestLong = searchingUsers[buddyUid].destLong;
+                        
+                    }
+                }
+            }
+            // update both the dictionary and the pool
+            searchingUsers[myUid].buddy = buddyUid;
+            searchingUsers[buddyUid].buddy = myUid;
+            pool.child(myUid).val().buddy = buddyUid;
+            pool.child(buddyUid).val().buddy = myUid;
+        }
+    }
+
+    let partnerUID = "";
+    let minDistSoFar = Number.POSITIVE_INFINITY;
+    pool.once("value").then(function(snapshot) {
+        snapshot.forEach(function(snapshot) {
+            const currPartnerUID = snapshot.key;
+            if (partnerUID !== myUid) {
+                const childData = snapshot.val();
+                const startDist = getDist(myStartLat, myStartLong, childData.startLat, childData.startLong);
+                const destDist = getDist(myDestLat, myDestLong, childData.destLat, childData.destLong);
+                const totalDist = startDist + destDist;
+                if (totalDist < minDistSoFar) {
+                    partnerUID = currPartnerUID;
+                    minDistSoFar = totalDist;
+                }
+            }
+        });
+    });
+    return null;
+};
+
+// TODO: Come up with an algorithm for matching HomeBuddies Basic algorithm: between users A and B, find min(dist(locationA, locationB) + dist(destA, destB)) using Manhattan distance
+app.post('/findBuddy', function(req, res) {
+    const pool = database.ref('users');
+    const myUid = auth.currentUser.uid;
     const myStartLat = pool.child(myUid).val().startLat;
     const myStartLong = pool.child(myUid).val().startLong;
     const myDestLat = pool.child(myUid).val().destLat;
     const myDestLong = pool.child(myUid).val().destLong;
 
-    // Find partner in pool closest to user
+    pool.child(myUid).update({
+        status: "searching"
+    });
+
+    /* Find partner in pool closest to user */
     let partnerUID = "";
     let minDistSoFar = Number.POSITIVE_INFINITY;
     pool.once("value").then(function(snapshot) {
@@ -166,28 +234,57 @@ app.post('/findBuddy', function(req, res) {
         });
     });
 
-    // Remove user and partner from pool
-    if (minDistSoFar !== Number.POSITIVE_INFINITY) {
-        pool.child(myUid).remove();
-        pool.child(partnerUID).remove();
+
+
+    return res.send(partnerUID);
+});
+
+app.post('/acceptBuddy', function(req, res) {
+    const pool = database.ref('users');
+    const myUID = auth.currentUser.uid;
+    const buddyUID = pool.child(myUID).val().buddy;
+
+
+    pool.child(myUID).update({
+        status: "pending",
+        buddy: buddyUID
+    });
+
+    if (pool.child(buddyUID).val().buddy == null) { // buddy unmatched
+
+        // alert buddy that they've been paired
+        return res.send(buddyUID);
+
+    } else if (pool.child(buddyUID).val().buddy === auth.currentUser.uid) { // buddy already matched with user
+
+
+
+        // Remove user and partner from pool
+        pool.child(auth.currentUser.uid).remove();
+        pool.child(buddyUID).remove();
+    } else { // buddy not matched with user but already matched
+        return res.send("");
     }
+});
 
-    // Alert the partner that they have been matched (if they are in pool, then they're waiting for partner)
+app.post('/declineBuddy', function(req, res) {
+    const pool = database.ref('users');
+    const buddyUID = pool.child(auth.currentUser.uid).val().buddy;
 
+    if (pool.child(buddyUID).val().buddy == null) { // buddy unmatched
 
+        // alert buddy that they've been paired
+
+        // wait for buddy to accept
+
+        // if buddy accepts, Remove user and partner from pool
+        pool.child(auth.currentUser.uid).remove();
+        pool.child(buddyUID).remove();
+    } else {
+
+    }
 });
 
 // TODO: Firebase send personal profile info to user after logging in so that it can be displayed? (firstname, lastname, age)
-app.get('/test', function (req, res) {
-    database.ref("users/" + req);
-    return res.send({'test': 'test message here!'});
-});
 
-// app.get('/', function (req, res) {
-//     console.log('GET root');
-//     res.sendFile(path.join(__dirname, 'build', 'index.html'));
-// });
-// TODO: Come up with an algorithm for matching HomeBuddies Basic algorithm: between users A and B, find min(dist(locationA, locationB) + dist(destA, destB)) using Manhattan distance
-
-// TODO: Implement the basic algorithm into the services to create pairings
 app.listen(port);
