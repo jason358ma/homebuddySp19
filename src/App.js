@@ -63,8 +63,8 @@ class Signup extends Component {
 
   render() {
     return (
-      <Router>
       <div className="App">
+      <Router>
         <header className="App-header">
           <img src={logo} className="App-logo" alt="logo" />
 
@@ -86,12 +86,13 @@ class Signup extends Component {
           <br/>
           <input type="submit" username="Submit" onClick={this.submitClicked}/>
             <Link to="/Map">
-              <button username="login" onClick={this.loginClicked}>LOGIN</button>
+              <button username="login" id="loginbutton" onClick={this.loginClicked}>LOGIN</button>
             </Link>
             <Route path="/Map/" component={MapContainer} />
         </header>
+        </Router>
       </div>
-      </Router>
+
     );
   }
 }
