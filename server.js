@@ -233,12 +233,18 @@ function pair() {
 async function findBuddy(myUid) {
     const pool = database.ref('users');
 
-    while (true) {
+    let buddyName = "";
+    let id = setInterval(findBuddyHelper, 1000);
+
+    function findBuddyHelper () {
         let buddyUid = pool.child(myUid).val().buddy;
         if (buddyUid != null) {
-            return pool.child(buddyUid).val().firstName + " " + pool.child(buddyUid).val().lastName;
+            buddyName = pool.child(buddyUid).val().firstName + " " + pool.child(buddyUid).val().lastName;
+            clearInterval(id);
         }
     }
+
+    return buddyName;
 }
 
 app.post('/findBuddy', function(req, res) {
@@ -255,15 +261,19 @@ app.post('/findBuddy', function(req, res) {
     });
 });
 
-async function acceptBuddy(myUid, buddyUid) {
-    const pool = database.ref('users');
-
+async function waitForBuddy(buddyUid) {
     // waiting for buddy to make a decision
-    while (true) {
+    let id = setInterval(acceptBuddyHelper, 1000);
+
+    function acceptBuddyHelper () {
         if (searchingUsers[buddyUid].status !== "pending") {
-            break;
+            clearInterval(id);
         }
     }
+}
+
+function acceptBuddy(myUid, buddyUid) {
+    const pool = database.ref('users');
 
     if (pool.child(buddyUid).val().status === "not searching" && pool.child(buddyUid).val().buddy === myUid) { // buddy agreed too
 
@@ -294,8 +304,8 @@ app.post('/acceptBuddy', function(req, res) {
     pool.child(myUid).val().status = "not searching";
 
     // check if buddy has accepted user as their buddy (asynchronous)
-    acceptBuddy(myUid, buddyUid).then(function(buddyAccepted) {
-        return res.send(buddyAccepted); // frontend should let user know if buddy accepted or not (true/false)
+    waitForBuddy(buddyUid).then(function() {
+        return res.send(acceptBuddy(myUid, buddyUid)); // frontend should let user know if buddy accepted or not (true/false)
     });
 });
 
