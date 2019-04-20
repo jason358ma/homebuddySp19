@@ -230,8 +230,7 @@ async function findBuddy(myUid) {
     while (true) {
         let buddyUid = pool.child(myUid).val().buddy;
         if (buddyUid != null) {
-            let buddyName = pool.child(buddyUid).val().firstName + " " + pool.child(buddyUid).val().lastName;
-            return buddyName;
+            return pool.child(buddyUid).val().firstName + " " + pool.child(buddyUid).val().lastName;
         }
     }
 }
@@ -240,14 +239,14 @@ app.post('/findBuddy', function(req, res) {
     const pool = database.ref('users');
     const myUid = auth.currentUser.uid;
 
-    // TODO: update searching users too
-    searchingUsers[myUid].status = "searching";
     pool.child(myUid).val().status = "searching";
+    pool.child(myUid).val().buddy = null;
+    // do not update searchingUsers because user shouldn't be in there yet
 
-    // see if buddy assigned
+    // see if buddy assigned - async: we don't want to be blocking while checking if buddy assigned to user
     findBuddy(myUid).then(function(buddyName) {
         return res.send(buddyName); // frontend might want buddyName to display to user
-    }); // asynchronous because we don't want to be blocking while checking if buddy assigned to user
+    });
 });
 
 async function acceptBuddy(myUid, buddyUid) {
@@ -268,7 +267,7 @@ async function acceptBuddy(myUid, buddyUid) {
         pool.child(myUid).val().status = "searching";
         searchingUsers[myUid].buddy = null;
         pool.child(myUid).val().buddy = null;
-        
+
         return false;
     }
 }
@@ -289,20 +288,12 @@ app.post('/acceptBuddy', function(req, res) {
 
 app.post('/declineBuddy', function(req, res) {
     const pool = database.ref('users');
-    const buddyUID = pool.child(auth.currentUser.uid).val().buddy;
+    const myUid = auth.currentUser.uid;
 
-    if (pool.child(buddyUID).val().buddy == null) { // buddy unmatched
-
-        // alert buddy that they've been paired
-
-        // wait for buddy to accept
-
-        // if buddy accepts, Remove user and partner from pool
-        pool.child(auth.currentUser.uid).remove();
-        pool.child(buddyUID).remove();
-    } else {
-
-    }
+    searchingUsers[myUid].status = "searching";
+    pool.child(myUid).val().status = "searching";
+    searchingUsers[myUid].buddy = null;
+    pool.child(myUid).val().buddy = null;
 });
 
 // TODO: Firebase send personal profile info to user after logging in so that it can be displayed? (firstname, lastname, age)
