@@ -43,6 +43,12 @@ function createChild(uid, firstName, lastName) {
         destLong: null,
         status: "not searching", // searching, pending, not searching
         buddy: null
+        // searching + buddy not null = not possible
+        // searching + buddy null = in searchingUsers, waiting for match
+        // pending + buddy not null = buddy assigned but no user decision of accept or reject
+        // pending + buddy null = not possible
+        // not searching + buddy not null = buddy found already, not in searchingUsers
+        // not searching + buddy null = in pool and not searching, just logged in, not in searchingUsers
     });
 }
 
@@ -252,6 +258,13 @@ app.post('/findBuddy', function(req, res) {
 async function acceptBuddy(myUid, buddyUid) {
     const pool = database.ref('users');
 
+    // waiting for buddy to make a decision
+    while (true) {
+        if (searchingUsers[buddyUid].status !== "pending") {
+            break;
+        }
+    }
+
     if (pool.child(buddyUid).val().status === "not searching" && pool.child(buddyUid).val().buddy === myUid) { // buddy agreed too
 
         // Prevent user and partner from being paired up with other people
@@ -293,6 +306,15 @@ app.post('/declineBuddy', function(req, res) {
     searchingUsers[myUid].status = "searching";
     pool.child(myUid).val().status = "searching";
     searchingUsers[myUid].buddy = null;
+    pool.child(myUid).val().buddy = null;
+});
+
+app.post('/stopSearching', function(req, res) {
+    const pool = database.ref('users');
+    const myUid = auth.currentUser.uid;
+
+    delete searchingUsers[myUid];
+    pool.child(myUid).val().status = "not searching";
     pool.child(myUid).val().buddy = null;
 });
 
