@@ -141,6 +141,7 @@ function getDist(lat_A, long_A, lat_B, long_B) {
     Date: Feb. 15, 2018
     Availability: https://stackoverflow.com/questions/14560999/using-the-haversine-formula-in-javascript
      */
+
     // haversine formula
     const toRad = x => (x * Math.PI) / 180;
     const R = 6371; // km
@@ -160,13 +161,14 @@ function getDist(lat_A, long_A, lat_B, long_B) {
     return distance; // returns distance in miles
 }
 
+let searchingUsers = {}; // TODO: only update and refer to searchingUsers and then flush changes to pool periodically? or update both everytime?
+
 setInterval(pair, 5000);
 
 function pair() {
     const pool = database.ref('users');
 
     /* Gather all searching users */
-    let searchingUsers = {};
     pool.once("value").then(function(snapshot) {
         snapshot.forEach(function(snapshot) {
             const currUID = snapshot.key;
@@ -207,77 +209,82 @@ function pair() {
             }
             // update both the dictionary and the pool
             searchingUsers[myUid].buddy = partnerUID;
-            searchingUsers[partnerUID].buddy = myUid;
             pool.child(myUid).val().buddy = partnerUID;
+            searchingUsers[myUid].status = "pending";
+            pool.child(myUid).val().status = "pending";
+
+            searchingUsers[partnerUID].buddy = myUid;
             pool.child(partnerUID).val().buddy = myUid;
+            searchingUsers[partnerUID].status = "pending";
+            pool.child(partnerUID).val().status = "pending";
+
         }
     }
 
     // no return needed because buddy attributes of people updated, so refer to that to find buddy
 }
 
+async function findBuddy(myUid) {
+    const pool = database.ref('users');
+
+    while (true) {
+        let buddyUid = pool.child(myUid).val().buddy;
+        if (buddyUid != null) {
+            let buddyName = pool.child(buddyUid).val().firstName + " " + pool.child(buddyUid).val().lastName;
+            return buddyName;
+        }
+    }
+}
+
 app.post('/findBuddy', function(req, res) {
     const pool = database.ref('users');
     const myUid = auth.currentUser.uid;
-    const myStartLat = pool.child(myUid).val().startLat;
-    const myStartLong = pool.child(myUid).val().startLong;
-    const myDestLat = pool.child(myUid).val().destLat;
-    const myDestLong = pool.child(myUid).val().destLong;
 
-    pool.child(myUid).update({
-        status: "searching"
-    });
+    // TODO: update searching users too
+    searchingUsers[myUid].status = "searching";
+    pool.child(myUid).val().status = "searching";
 
-    /* Find partner in pool closest to user */
-    let partnerUID = "";
-    let minDistSoFar = Number.POSITIVE_INFINITY;
-    pool.once("value").then(function(snapshot) {
-        snapshot.forEach(function(snapshot) {
-            const currPartnerUID = snapshot.key;
-            if (partnerUID !== myUid) {
-                const childData = snapshot.val();
-                const startDist = getDist(myStartLat, myStartLong, childData.startLat, childData.startLong);
-                const destDist = getDist(myDestLat, myDestLong, childData.destLat, childData.destLong);
-                const totalDist = startDist + destDist;
-                if (totalDist < minDistSoFar) {
-                    partnerUID = currPartnerUID;
-                    minDistSoFar = totalDist;
-                }
-            }
-        });
-    });
-
-
-
-    return res.send(partnerUID);
+    // see if buddy assigned
+    findBuddy(myUid).then(function(buddyName) {
+        return res.send(buddyName); // frontend might want buddyName to display to user
+    }); // asynchronous because we don't want to be blocking while checking if buddy assigned to user
 });
+
+async function acceptBuddy(myUid, buddyUid) {
+    const pool = database.ref('users');
+
+    if (pool.child(buddyUid).val().status === "not searching" && pool.child(buddyUid).val().buddy === myUid) { // buddy agreed too
+
+        // Prevent user and partner from being paired up with other people
+        delete searchingUsers[myUid];
+        delete searchingUsers[buddyUid];
+        // do not remove from pool
+
+        return true;
+    } else if (!searchingUsers.hasOwnProperty(buddyUid) || (searchingUsers[buddyUid].status === "searching" && searchingUsers[buddyUid].buddy == null)) { // buddy removed themselves or rejected
+
+        // the search continues
+        searchingUsers[myUid].status = "searching";
+        pool.child(myUid).val().status = "searching";
+        searchingUsers[myUid].buddy = null;
+        pool.child(myUid).val().buddy = null;
+        
+        return false;
+    }
+}
 
 app.post('/acceptBuddy', function(req, res) {
     const pool = database.ref('users');
-    const myUID = auth.currentUser.uid;
-    const buddyUID = pool.child(myUID).val().buddy;
+    const myUid = auth.currentUser.uid;
+    const buddyUid = pool.child(myUid).val().buddy;
 
+    searchingUsers[myUid].status = "not searching";
+    pool.child(myUid).val().status = "not searching";
 
-    pool.child(myUID).update({
-        status: "pending",
-        buddy: buddyUID
+    // check if buddy has accepted user as their buddy (asynchronous)
+    acceptBuddy(myUid, buddyUid).then(function(buddyAccepted) {
+        return res.send(buddyAccepted); // frontend should let user know if buddy accepted or not (true/false)
     });
-
-    if (pool.child(buddyUID).val().buddy == null) { // buddy unmatched
-
-        // alert buddy that they've been paired
-        return res.send(buddyUID);
-
-    } else if (pool.child(buddyUID).val().buddy === auth.currentUser.uid) { // buddy already matched with user
-
-
-
-        // Remove user and partner from pool
-        pool.child(auth.currentUser.uid).remove();
-        pool.child(buddyUID).remove();
-    } else { // buddy not matched with user but already matched
-        return res.send("");
-    }
 });
 
 app.post('/declineBuddy', function(req, res) {
