@@ -116,7 +116,7 @@ app.post("/passwordReset", function(req, res) {
         // [END_EXCLUDE]
     });
 });
-// TODO: Figure out how to have frontend send start and dest coordinates to be stored in user data on backend (HTTPS POST request?)
+
 app.post('/coordinates', function (req, res) {
     const ref = database.ref('users');
     const uid = auth.currentUser.uid;
@@ -136,7 +136,28 @@ app.post('/coordinates', function (req, res) {
 });
 
 function getDist(lat_A, long_A, lat_B, long_B) {
-    // use haversine formula
+    /*
+    Author: Harry Mumford-Turner
+    Date: Feb. 15, 2018
+    Availability: https://stackoverflow.com/questions/14560999/using-the-haversine-formula-in-javascript
+     */
+    // haversine formula
+    const toRad = x => (x * Math.PI) / 180;
+    const R = 6371; // km
+
+    const dLat = toRad(lat_B - lat_A);
+    const dLatSin = Math.sin(dLat / 2);
+    const dLon = toRad(long_B - long_A);
+    const dLonSin = Math.sin(dLon / 2);
+
+    const a = (dLatSin * dLatSin) +
+        (Math.cos(toRad(long_A)) * Math.cos(toRad(long_B)) * dLonSin * dLonSin);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    let distance = R * c;
+
+    distance /= 1.60934;
+
+    return distance; // returns distance in miles
 }
 
 setInterval(pair, 5000);
@@ -191,9 +212,10 @@ function pair() {
             pool.child(partnerUID).val().buddy = myUid;
         }
     }
+
+    // no return needed because buddy attributes of people updated, so refer to that to find buddy
 }
 
-// TODO: Come up with an algorithm for matching HomeBuddies Basic algorithm: between users A and B, find min(dist(locationA, locationB) + dist(destA, destB)) using Manhattan distance
 app.post('/findBuddy', function(req, res) {
     const pool = database.ref('users');
     const myUid = auth.currentUser.uid;
