@@ -71,6 +71,7 @@ app.post('/signup', function(req, res) {
             // User is signed in.
             let uid = user.uid;
             createChild(uid, req.body.firstName, req.body.lastName);
+            res.send("Signup successful");
         } else {
             // No user is signed in.
         }
@@ -254,6 +255,7 @@ app.post('/findBuddy', function(req, res) {
     pool.child(myUid).val().status = "searching";
     pool.child(myUid).val().buddy = null;
     // do not update searchingUsers because user shouldn't be in there yet
+    // no need to add user to searchingUsers because pair() should retrieve it from pool
 
     // see if buddy assigned - async: we don't want to be blocking while checking if buddy assigned to user
     findBuddy(myUid).then(function(buddyName) {
