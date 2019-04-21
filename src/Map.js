@@ -61,6 +61,10 @@ export class Map extends React.Component {
         lat: lat,
         lng: lng
       },
+      destination: {
+          lat: 37.868112,
+          lng: -122.255033
+      },
       directionsService : directionsService,
       directionsDisplay : directionsDisplay,
       searchBox : searchBox,
@@ -94,7 +98,7 @@ export class Map extends React.Component {
     }
   }
 
-  loadMap() {
+  loadMap = () => {
     if (this.props && this.props.google) {
       // checks if google is available
       const { google } = this.props;
@@ -119,21 +123,16 @@ export class Map extends React.Component {
       this.map = new maps.Map(node, mapConfig);
       this.state.directionsDisplay.setMap(this.map);
 
-
     //   let destination = { //unit 1
     //     lat: 37.868112,
     //     lng: -122.255033
     //   }
     //   this.displayRoute(destination);
 
-
       var input = document.getElementById('pac-input');
       var searchBox = new google.maps.places.SearchBox(input)
       this.map.controls[google.maps.ControlPosition.TOP_LEFT].push(input);
       var markers = [];
-      var destlat = 37.868112
-      var destlon = -122.255033
-    //   by default, Unit 1
 
       searchBox.addListener('places_changed', function() {
           var places = searchBox.getPlaces();
@@ -146,7 +145,7 @@ export class Map extends React.Component {
           markers = [];
         //   for each new place, get icon name and location
         //   var bounds = google.LatLngBounds();
-          places.forEach(function(place) {
+          places.forEach((place) => {
               if (!place.geometry) {
                 console.log("Returned place contains no geometry");
                 return;
@@ -166,10 +165,43 @@ export class Map extends React.Component {
                   title: place.name,
                   position: place.geometry.location
               }));
-              console.log(place.geometry.location.lat())
-              console.log(place.geometry.location.lng())
-              destlat = place.geometry.location.lat()
-              destlon = place.geometry.location.lng()
+            //   console.log(place.geometry.location.lat())
+            //   console.log(place.geometry.location.lng())
+            //   destination = {lat: place.geometry.location.lat(), lng: place.geometry.location.lng()}
+
+              var getLatLng = new Promise(function(resolve, reject) {
+                  var lat = place.geometry.location.lat()
+                  var lng = place.geometry.location.lng()
+                  var dest = {lat, lng}
+                  resolve(dest)
+              })
+
+              var getLatLngCallback = (value) => {
+                  console.log("value:")
+                  console.log(value)
+                  console.log(this.state)
+                  console.log("state")
+                  this.setState((state) => {
+                      return {destination: value}
+                  }, () => {
+                      console.log(this.state.destination)
+                      this.loadMap()
+                  });
+              }
+
+              getLatLng.then((value) => {
+                //   console.log("value:")
+                //   console.log(value)
+                //   console.log(this.state)
+                //   console.log("state")
+                //   this.setState((state) => {
+                //       return {destination: value}
+                //   }, () => {
+                //       console.log(this.state.destination)
+                //       this.loadMap()
+                //   });
+                getLatLngCallback(value)
+              })
 
             //   if (place.geometry.viewport) {
             //       // Only geocodes have viewport.
@@ -180,18 +212,16 @@ export class Map extends React.Component {
           })
         //   this.map.fitBounds(bounds)
 
-      });
-    //   THIS IS RUN BEFORE ^^
-      let destination = { //unit 1
-        lat: destlat,
-        lng: destlon
-      }
-      this.displayRoute(destination);
+    });
+      console.log(this.state)
+      this.displayRoute(this.state.destination)
+    //  need to call displayRoute here
 
     }
 }
 
-  displayRoute(destination) { //display route from current location to specified destination\
+
+displayRoute(destination) { //display route from current location to specified destination
     this.state.directionsService.route({
         origin: new this.props.google.maps.LatLng(this.state.currentLocation.lat, this.state.currentLocation.lng),
         destination: new this.props.google.maps.LatLng(destination.lat, destination.lng),
@@ -258,6 +288,7 @@ export class Map extends React.Component {
     );
   }
 }
+
 export default Map;
 
 
