@@ -134,7 +134,7 @@ export class Map extends React.Component {
       this.map.controls[google.maps.ControlPosition.TOP_LEFT].push(input);
       var markers = [];
 
-      searchBox.addListener('places_changed', function() {
+      searchBox.addListener('places_changed', () => {
           var places = searchBox.getPlaces();
           if (places.length == 0) {
               return;
@@ -216,7 +216,6 @@ export class Map extends React.Component {
       console.log(this.state)
       this.displayRoute(this.state.destination)
     //  need to call displayRoute here
-
     }
 }
 
