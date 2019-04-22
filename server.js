@@ -50,7 +50,14 @@ function createChild(uid, firstName, lastName) {
 }
 
 app.post('/signup', function(req, res) {
-    firebase.auth().createUserWithEmailAndPassword(req.body.email, req.body.password).catch(function(error) {
+    console.log(req);
+    console.log(req.body);
+    firebase.auth().createUserWithEmailAndPassword(req.body.email, req.body.password)
+        .then(function(value) {
+            console.log("fulfilled!");
+            console.log(value);
+        })
+        .catch(function(error) {
         // Handle Errors here.
         const errorCode = error.code;
         const errorMessage = error.message;
