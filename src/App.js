@@ -56,9 +56,12 @@ class Signup extends Component {
     }
 
     loginClicked = () => {
-      // export default GoogleApiWrapper({
-      //   apiKey: 'AIzaSyDfaCamdV4CSw1jBTG8NZeem0YG6kguM3s'
-      // })(MapContainer);
+      axios.post("/signin", {
+          email: this.state.username,
+          password: this.state.password,
+      }).then(response => {
+          console.log(response.data);
+      })
     }
 
   render() {

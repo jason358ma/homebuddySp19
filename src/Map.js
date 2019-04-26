@@ -272,7 +272,6 @@ displayRoute(destination) { //display route from current location to specified d
     const style = Object.assign({}, mapStyles.map);
     const stylesearchbar = Object.assign({}, searchboxStyles.searchbox);
 
-
     return (
       <div>
           <div style={stylesearchbar}>
