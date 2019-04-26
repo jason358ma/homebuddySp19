@@ -98,6 +98,13 @@ export class Map extends React.Component {
     }
   }
 
+getBuddy = () => {
+  axios.get("/findBuddy", {
+  }).then(response => {
+      console.log("buddy name: " + response.data);
+  })
+}
+
   loadMap = () => {
     if (this.props && this.props.google) {
       // checks if google is available
@@ -185,6 +192,16 @@ export class Map extends React.Component {
                       return {destination: value}
                   }, () => {
                       console.log(this.state.destination)
+
+                      axios.post("/coordinates", {
+                          startLat: this.state.currentLocation.lat,
+                          startLong: this.state.currentLocation.long,
+                          destLat: this.state.destination.lat,
+                          destLong: this.state.destination.long,
+                      }).then(response => {
+                          console.log("coordinates sent");
+                      })
+
                       this.loadMap()
                   });
               }
