@@ -20,7 +20,7 @@ const database = firebase.database();
 const auth = firebase.auth();
 app.use(express.json());
 
-app.use(favicon(__dirname + '/build/favicon.ico'));
+// app.use(favicon(__dirname + '/build/favicon.ico'));
 // the __dirname is the current directory from where the script is running
 app.use(express.static(__dirname));
 app.use(express.static(path.join(__dirname, 'build')));
@@ -64,8 +64,6 @@ app.post('/signup', function(req, res) {
             res.send(errorMessage);
         }
         // [END_EXCLUDE]
-    }).then(function (response) {
-        res.send("signup successful!");
     });
     // [END createwithemail]
     firebase.auth().onAuthStateChanged(function(user) {
