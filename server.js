@@ -91,7 +91,7 @@ app.post('/signin', function(req, res) {
         if (errorCode === 'auth/wrong-password') {
             res.send('Wrong password.');
         } else {
-            res.send(errorMessage);
+            res.send(auth.currentUser.uid);
         }
     });
 });
