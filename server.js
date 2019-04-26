@@ -90,7 +90,7 @@ app.post('/signin', function(req, res) {
         if (errorCode === 'auth/wrong-password') {
             res.send('Wrong password.');
         } else {
-            res.send(errorMessage);
+            res.send('Login successful');
         }
     });
 });
@@ -233,7 +233,7 @@ function pair() {
     // no return needed because buddy attributes of people updated, so refer to that to find buddy
 }
 
-async function findBuddy(myUid) {
+async function findBuddy(myUidgit pu) {
     const pool = database.ref('users');
 
     let buddyName = "";

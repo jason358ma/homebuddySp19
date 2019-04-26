@@ -199,7 +199,7 @@ getBuddy = () => {
                           destLat: this.state.destination.lat,
                           destLong: this.state.destination.long,
                       }).then(response => {
-                          console.log("coordinates sent");
+                          console.log(response.data);
                       })
 
                       this.loadMap()
