@@ -233,7 +233,7 @@ function pair() {
     // no return needed because buddy attributes of people updated, so refer to that to find buddy
 }
 
-async function findBuddy(myUidgit pu) {
+async function findBuddy(myUid) {
     const pool = database.ref('users');
 
     let buddyName = "";
