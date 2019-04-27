@@ -99,7 +99,7 @@ export class Map extends React.Component {
   }
 
 getBuddy = () => {
-  axios.get("/findBuddy", {
+  axios.post("/findBuddy", {
   }).then(response => {
       console.log("buddy name: " + response.data);
   })
@@ -270,6 +270,7 @@ displayRoute(destination) { //display route from current location to specified d
 
   renderChildren() {
     const { children } = this.props;
+    console.log("children: " + children);
 
     if (!children) return;
 
@@ -294,11 +295,13 @@ displayRoute(destination) { //display route from current location to specified d
           <div style={stylesearchbar}>
             <input id="pac-input" class="controls" type="text" placeholder="Search box"/>
           </div>
-
+          <div>
+              <button id="search-button">Find Buddy!</button>
+          </div>
         <div id="map" style={style} ref="map">
           Loading map...
         </div>
-        {this.renderChildren()}
+        {/*{this.renderChildren()}*/}
       </div>
     );
   }
