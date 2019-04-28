@@ -217,6 +217,7 @@ function pair() {
         });
     }).then(function() {
         /* Pair searching users by distance*/
+        console.log(searchingUsers)
         for (let myUid in searchingUsers) {
             if (searchingUsers.hasOwnProperty(myUid)) {
                 const myStartLat = searchingUsers[myUid].startLat;
@@ -255,20 +256,22 @@ function pair() {
                     pool.child(myUid).update({
                         buddy: partnerUID,
                         status: "pending"
-                    });
+                    }).then(function() {
+                        searchingUsers[partnerUID].buddy = myUid;
+                        // pool.child(partnerUID).val().buddy = myUid;
+                        searchingUsers[partnerUID].status = "pending";
+                        // pool.child(partnerUID).val().status = "pending";
 
-                    searchingUsers[partnerUID].buddy = myUid;
-                    // pool.child(partnerUID).val().buddy = myUid;
-                    searchingUsers[partnerUID].status = "pending";
-                    // pool.child(partnerUID).val().status = "pending";
-
-                    pool.child(partnerUID).update({
-                        buddy: myUid,
-                        status: "pending"
+                        pool.child(partnerUID).update({
+                            buddy: myUid,
+                            status: "pending"
+                        });
+                    }).then(function() {
+                        console.log("myUID:" + myUid + " partnerUID:" + partnerUID);
                     });
+                } else {
+                    console.log("partnerUID is null!")
                 }
-
-                console.log("myUID:" + myUid + " partnerUID:" + partnerUID)
             }
         }
     });
