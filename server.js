@@ -158,7 +158,7 @@ app.post("/passwordReset", function(req, res) {
 app.post('/coordinates', function (req, res) {
     const ref = database.ref('users');
     const uid = currentUserID;
-    ref.child(uid).set({
+    ref.child(uid).update({
         startLat: req.body.startLat,
         startLong: req.body.startLong,
         destLat: req.body.destLat,
