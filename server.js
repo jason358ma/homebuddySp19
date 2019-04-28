@@ -5,6 +5,7 @@ const firebase = require("firebase");
 const path = require('path');
 const port = process.env.PORT || 8080;
 const app = express();
+const cors = require('cors');
 
 const config = {
     apiKey: "AIzaSyBtYCRExBERnTmIOWOA5MLhko93oi_7I88",
@@ -19,6 +20,8 @@ firebase.initializeApp(config);
 const database = firebase.database();
 const auth = firebase.auth();
 app.use(express.json());
+
+app.use(cors());
 
 app.use(favicon(__dirname + '/build/favicon.ico'));
 // the __dirname is the current directory from where the script is running
@@ -52,6 +55,11 @@ function createChild(uid, firstName, lastName) {
     });
 }
 
+app.get('/', function(req, res) {
+    console.log("reached the home page!")
+    res.send('Home page!')
+});
+
 app.post('/signup', function(req, res) {
     firebase.auth().createUserWithEmailAndPassword(req.body.email, req.body.password).catch(function(error) {
         // Handle Errors here.
@@ -82,16 +90,20 @@ app.post('/signup', function(req, res) {
 
 // Sign in
 app.post('/signin', function(req, res) {
-    firebase.auth().signInWithEmailAndPassword(req.body.email, req.body.password).catch(function(error) {
-        // Handle Errors here.
-        const errorCode = error.code;
-        const errorMessage = error.message;
-        // [START_EXCLUDE]
-        if (errorCode === 'auth/wrong-password') {
-            res.send('Wrong password.');
-        } else {
+    firebase.auth().signInWithEmailAndPassword(req.body.email, req.body.password)
+        .catch(function(error) {
+            // Handle Errors here.
+            const errorCode = error.code;
+            const errorMessage = error.message;
+            // [START_EXCLUDE]
+            if (errorCode === 'auth/wrong-password') {
+                res.send('Wrong password.');
+            } else {
+                res.send(errorCode);
+            }
+        }).then(function(data) {
+            console.log("Login success!");
             res.send('Login successful');
-        }
     });
 });
 
