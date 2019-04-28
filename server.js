@@ -101,10 +101,11 @@ app.post('/signin', function(req, res) {
             } else {
                 res.send(errorCode);
             }
-        }).then(function(data) {
-            console.log("Login success!");
-            res.send('Login successful');
-    });
+        })
+        // .then(function(data) {
+        //     console.log("Login success!");
+        //     res.send('Login successful');
+        // });
 
     firebase.auth().onAuthStateChanged(function(user) {
         if (user) {
@@ -112,6 +113,7 @@ app.post('/signin', function(req, res) {
             res.send(user.uid);
         } else {
             // No user is signed in.
+            res.send("no user id")
         }
     });
 });
