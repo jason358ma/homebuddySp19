@@ -191,13 +191,14 @@ getBuddy = () => {
                   this.setState((state) => {
                       return {destination: value}
                   }, () => {
-                      console.log(this.state.destination)
+                      console.log("STATE")
+                      console.log(this.state)
 
                       axios.post("/coordinates", {
                           startLat: this.state.currentLocation.lat,
-                          startLong: this.state.currentLocation.long,
+                          startLong: this.state.currentLocation.lng,
                           destLat: this.state.destination.lat,
-                          destLong: this.state.destination.long,
+                          destLong: this.state.destination.lng,
                       }).then(response => {
                           console.log(response.data);
                       })
