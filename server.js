@@ -104,6 +104,7 @@ app.post('/signin', function(req, res) {
         }).then(function(data) {
             console.log("Login success!");
             res.send('Login successful');
+            res.send(auth.currentUser.uid)
     });
 });
 
