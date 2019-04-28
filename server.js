@@ -282,23 +282,20 @@ function pair() {
 async function findBuddy(myUid) {
     const pool = database.ref('users');
 
-    let buddyName = "";
-    let id = setInterval(findBuddyHelper, 1000);
-
-    function findBuddyHelper () {
-        let buddyUid = null;
+    let buddyVals = null;
+    // busy wait here instead using while loop
+    while (buddyVals == null) {
         pool.child(myUid).once("value").then(function(snapshot){
-            buddyUid = snapshot.val().buddy;
+            let buddyUid = snapshot.val().buddy;
             if (buddyUid != null) {
                 pool.child(buddyUid).once("value").then(function(buddySnapshot) {
-                    buddyName = buddySnapshot.val().firstName + " " + buddySnapshot.val().lastName;
-                    clearInterval(id);
+                    buddyVals = buddySnapshot.val();
                 });
             }
         });
     }
 
-    return buddyName;
+    return buddyVals;
 }
 
 app.post('/findBuddy', function(req, res) {
@@ -310,8 +307,8 @@ app.post('/findBuddy', function(req, res) {
         buddy: null
         }
     ).then(function (data) {
-        findBuddy(myUid).then(function(buddyName) {
-            return res.send(buddyName); // frontend might want buddyName to display to user
+        findBuddy(myUid).then(function(buddyVals) {
+            res.send(buddyVals); // frontend might want buddyName to display to user
         });
     });
     // do not update searchingUsers because user shouldn't be in there yet
