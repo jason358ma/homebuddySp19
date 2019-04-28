@@ -269,11 +269,14 @@ async function findBuddy(myUid) {
     let id = setInterval(findBuddyHelper, 1000);
 
     function findBuddyHelper () {
-        let buddyUid = pool.child(myUid).val().buddy;
-        if (buddyUid != null) {
-            buddyName = pool.child(buddyUid).val().firstName + " " + pool.child(buddyUid).val().lastName;
-            clearInterval(id);
-        }
+        let buddyUid = null;
+        pool.child(myUid).once("value").then(function(snapshot){
+            buddyUid = snapshot.val().buddy;
+            if (buddyUid != null) {
+                buddyName = pool.child(buddyUid).val().firstName + " " + pool.child(buddyUid).val().lastName;
+                clearInterval(id);
+            }
+        });
     }
 
     return buddyName;
