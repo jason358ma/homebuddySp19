@@ -265,6 +265,7 @@ function pair() {
                     status: "pending"
                 });
 
+                console.log("myUID:" + myUid + " partnerUID:" + partnerUID)
             }
         }
     });
