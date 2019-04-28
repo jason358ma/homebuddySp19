@@ -281,10 +281,13 @@ async function findBuddy(myUid) {
 
 app.post('/findBuddy', function(req, res) {
     const pool = database.ref('users');
-    const myUid = auth.currentUser.uid;
+    const myUid = currentUserID;
 
-    pool.child(myUid).val().status = "searching";
-    pool.child(myUid).val().buddy = null;
+    pool.child(myUid).update({
+        status: "searching",
+        buddy: null
+        }
+    );
     // do not update searchingUsers because user shouldn't be in there yet
     // no need to add user to searchingUsers because pair() should retrieve it from pool
 
@@ -330,7 +333,7 @@ function acceptBuddy(myUid, buddyUid) {
 
 app.post('/acceptBuddy', function(req, res) {
     const pool = database.ref('users');
-    const myUid = auth.currentUser.uid;
+    const myUid = currentUserID;
     const buddyUid = pool.child(myUid).val().buddy;
 
     searchingUsers[myUid].status = "not searching";
@@ -344,7 +347,7 @@ app.post('/acceptBuddy', function(req, res) {
 
 app.post('/declineBuddy', function(req, res) {
     const pool = database.ref('users');
-    const myUid = auth.currentUser.uid;
+    const myUid = currentUserID;
 
     searchingUsers[myUid].status = "searching";
     pool.child(myUid).val().status = "searching";
@@ -354,7 +357,7 @@ app.post('/declineBuddy', function(req, res) {
 
 app.post('/stopSearching', function(req, res) {
     const pool = database.ref('users');
-    const myUid = auth.currentUser.uid;
+    const myUid = currentUserID;
 
     delete searchingUsers[myUid];
     pool.child(myUid).val().status = "not searching";
