@@ -287,14 +287,16 @@ app.post('/findBuddy', function(req, res) {
         status: "searching",
         buddy: null
         }
-    );
+    ).then(function (data) {
+        findBuddy(myUid).then(function(buddyName) {
+            return res.send(buddyName); // frontend might want buddyName to display to user
+        });
+    });
     // do not update searchingUsers because user shouldn't be in there yet
     // no need to add user to searchingUsers because pair() should retrieve it from pool
 
     // see if buddy assigned - async: we don't want to be blocking while checking if buddy assigned to user
-    findBuddy(myUid).then(function(buddyName) {
-        return res.send(buddyName); // frontend might want buddyName to display to user
-    });
+
 });
 
 async function waitForBuddy(buddyUid) {
