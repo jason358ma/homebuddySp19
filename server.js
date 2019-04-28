@@ -19,6 +19,9 @@ firebase.initializeApp(config);
 
 const database = firebase.database();
 const auth = firebase.auth();
+
+let currentUserID = null;
+
 app.use(express.json());
 
 app.use(cors());
@@ -88,6 +91,18 @@ app.post('/signup', function(req, res) {
     });
 });
 
+firebase.auth().onAuthStateChanged(function(user) {
+    console.log("auth state changed!");
+    if (user) {
+        // User is signed in.
+        currentUserID = user.uid
+        console.log("currentUserID: " + currentUserID);
+    } else {
+        // No user is signed in.
+        console.log("no user signed in!")
+    }
+});
+
 // Sign in
 app.post('/signin', function(req, res) {
     firebase.auth().signInWithEmailAndPassword(req.body.email, req.body.password)
@@ -107,16 +122,6 @@ app.post('/signin', function(req, res) {
                 res.send(errorCode);
             }
         });
-
-    firebase.auth().onAuthStateChanged(function(user) {
-        if (user) {
-            // User is signed in.
-            res.send(user.uid);
-        } else {
-            // No user is signed in.
-            res.send("no user id")
-        }
-    });
 });
 
 // Send email verification
