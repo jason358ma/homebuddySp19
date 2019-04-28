@@ -38,6 +38,28 @@ const searchboxStyles = {
     //   }
 };
 
+const buttonStyles = {
+    button: {
+        position: 'absolute',
+        zIndex: 1,
+        width: '8%',
+        height: '8%',
+    }
+    // searchbox: {
+    //       background-color: '#fff';
+    //       fontFamily: 'Roboto';
+    //       fontSize: '15px';
+    //       fontWeight: '300';
+    //       marginLeft: '12px';
+    //       padding: '0 11px 0 13px';
+    //     //   textOverflow: 'ellipsis';
+    //       position: 'absolute',
+    //       width: '30%'
+    //       top: '0px';
+    //       left: '0px'
+    //   }
+};
+
 class searchBox extends React.Component {
     constructor(props) {
 
@@ -54,7 +76,14 @@ export class Map extends React.Component {
     const directionsDisplay = new this.props.google.maps.DirectionsRenderer();
     // const searchBox = new this.props.google.maps.places.SearchBox();
     var searchBox = new this.props.google.maps.places.SearchBox(document.getElementById('pac-input'));
-
+    // var pairButton = React.createClass({
+    //   render : function() {
+    //     return (
+    //       <button
+    //         onClick={this.getBuddy}>Pair Buddy</button>
+    //     );
+    //   }
+    // });
 
     this.state = {
       currentLocation: {
@@ -70,7 +99,6 @@ export class Map extends React.Component {
       searchBox : searchBox,
     };
   }
-
 
   componentDidMount() {
     if (this.props.centerAroundCurrentLocation) {
@@ -98,12 +126,12 @@ export class Map extends React.Component {
     }
   }
 
-getBuddy = () => {
-  axios.post("/findBuddy", {
-  }).then(response => {
-      console.log("buddy name: " + response.data);
-  })
-}
+  getBuddy = () => {
+    axios.post("/findBuddy", {
+    }).then(response => {
+        console.log("buddy name: " + response.data);
+    })
+  }
 
   loadMap = () => {
     if (this.props && this.props.google) {
@@ -290,21 +318,22 @@ displayRoute(destination) { //display route from current location to specified d
     // console.log(this.props);
     const style = Object.assign({}, mapStyles.map);
     const stylesearchbar = Object.assign({}, searchboxStyles.searchbox);
+    const stylebutton = Object.assign({}, buttonStyles.button);
 
     return (
       <div>
           <div style={stylesearchbar}>
             <input id="pac-input" class="controls" type="text" placeholder="Search box"/>
           </div>
-          <div>
-              <button id="search-button">Find Buddy!</button>
+          <div style={stylebutton}>
+              <button id="search-button" onClick={this.getBuddy}>Find Buddy!</button>
           </div>
         <div id="map" style={style} ref="map">
           Loading map...
         </div>
-        {/*{this.renderChildren()}*/}
       </div>
     );
+    this.renderChildren()
   }
 }
 
