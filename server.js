@@ -104,7 +104,15 @@ app.post('/signin', function(req, res) {
         }).then(function(data) {
             console.log("Login success!");
             res.send('Login successful');
-            res.send(auth.currentUser.uid)
+    });
+
+    firebase.auth().onAuthStateChanged(function(user) {
+        if (user) {
+            // User is signed in.
+            res.send(user.uid);
+        } else {
+            // No user is signed in.
+        }
     });
 });
 
