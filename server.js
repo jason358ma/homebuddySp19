@@ -284,7 +284,7 @@ async function findBuddy(myUid) {
             buddyUid = snapshot.val().buddy;
             if (buddyUid != null) {
                 pool.child(buddyUid).once("value").then(function(buddySnapshot) {
-                    clearInterval(id);	                    buddyName = buddySnapshot.val().firstName + " " + buddySnapshot.val().lastName;
+                    buddyName = buddySnapshot.val().firstName + " " + buddySnapshot.val().lastName;
                     clearInterval(id);
                 });
             }
