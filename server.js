@@ -91,6 +91,11 @@ app.post('/signup', function(req, res) {
 // Sign in
 app.post('/signin', function(req, res) {
     firebase.auth().signInWithEmailAndPassword(req.body.email, req.body.password)
+        .then(function(data) {
+            console.log("Login success!");
+            res.send(data);
+            res.send('Login successful');
+        })
         .catch(function(error) {
             // Handle Errors here.
             const errorCode = error.code;
@@ -101,11 +106,6 @@ app.post('/signin', function(req, res) {
             } else {
                 res.send(errorCode);
             }
-        })
-        .then(function(data) {
-            console.log("Login success!");
-            res.send(data);
-            res.send('Login successful');
         });
 
     firebase.auth().onAuthStateChanged(function(user) {
