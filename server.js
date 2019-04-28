@@ -273,8 +273,10 @@ async function findBuddy(myUid) {
         pool.child(myUid).once("value").then(function(snapshot){
             buddyUid = snapshot.val().buddy;
             if (buddyUid != null) {
-                buddyName = pool.child(buddyUid).val().firstName + " " + pool.child(buddyUid).val().lastName;
-                clearInterval(id);
+                pool.child(buddyUid).once("value").then(function(buddySnapshot) {
+                    buddyName = buddySnapshot.val().firstName + " " + buddySnapshot.val().lastName;
+                    clearInterval(id);
+                });
             }
         });
     }
