@@ -102,10 +102,11 @@ app.post('/signin', function(req, res) {
                 res.send(errorCode);
             }
         })
-        // .then(function(data) {
-        //     console.log("Login success!");
-        //     res.send('Login successful');
-        // });
+        .then(function(data) {
+            console.log("Login success!");
+            res.send(data);
+            res.send('Login successful');
+        });
 
     firebase.auth().onAuthStateChanged(function(user) {
         if (user) {
