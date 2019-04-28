@@ -224,7 +224,7 @@ function pair() {
                 const myDestLat = searchingUsers[myUid].destLat;
                 const myDestLong = searchingUsers[myUid].destLong;
 
-                let partnerUID = "";
+                let partnerUID = null;
                 let minDistSoFar = Number.POSITIVE_INFINITY;
                 for (let buddyUid in searchingUsers) {
                     if (myUid !== buddyUid && searchingUsers[myUid].buddy == null) {
@@ -244,26 +244,29 @@ function pair() {
                         }
                     }
                 }
-                // update both the dictionary and the pool
-                searchingUsers[myUid].buddy = partnerUID;
-                // pool.child(myUid).val().buddy = partnerUID;
-                searchingUsers[myUid].status = "pending";
-                // pool.child(myUid).val().status = "pending";
 
-                pool.child(myUid).update({
-                    buddy: partnerUID,
-                    status: "pending"
-                });
+                if (partnerUID != null) {
+                    // update both the dictionary and the pool
+                    searchingUsers[myUid].buddy = partnerUID;
+                    // pool.child(myUid).val().buddy = partnerUID;
+                    searchingUsers[myUid].status = "pending";
+                    // pool.child(myUid).val().status = "pending";
 
-                searchingUsers[partnerUID].buddy = myUid;
-                // pool.child(partnerUID).val().buddy = myUid;
-                searchingUsers[partnerUID].status = "pending";
-                // pool.child(partnerUID).val().status = "pending";
+                    pool.child(myUid).update({
+                        buddy: partnerUID,
+                        status: "pending"
+                    });
 
-                pool.child(partnerUID).update({
-                    buddy: myUid,
-                    status: "pending"
-                });
+                    searchingUsers[partnerUID].buddy = myUid;
+                    // pool.child(partnerUID).val().buddy = myUid;
+                    searchingUsers[partnerUID].status = "pending";
+                    // pool.child(partnerUID).val().status = "pending";
+
+                    pool.child(partnerUID).update({
+                        buddy: myUid,
+                        status: "pending"
+                    });
+                }
 
                 console.log("myUID:" + myUid + " partnerUID:" + partnerUID)
             }
