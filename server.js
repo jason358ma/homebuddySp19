@@ -215,49 +215,59 @@ function pair() {
                 searchingUsers[currUID] = childData;
             }
         });
-    });
+    }).then(function() {
+        /* Pair searching users by distance*/
+        for (let myUid in searchingUsers) {
+            if (searchingUsers.hasOwnProperty(myUid)) {
+                const myStartLat = searchingUsers[myUid].startLat;
+                const myStartLong = searchingUsers[myUid].startLong;
+                const myDestLat = searchingUsers[myUid].destLat;
+                const myDestLong = searchingUsers[myUid].destLong;
 
-    /* Pair searching users by distance*/
-    for (let myUid in searchingUsers) {
-        if (searchingUsers.hasOwnProperty(myUid)) {
-            const myStartLat = pool.child(myUid).val().startLat;
-            const myStartLong = pool.child(myUid).val().startLong;
-            const myDestLat = pool.child(myUid).val().destLat;
-            const myDestLong = pool.child(myUid).val().destLong;
+                let partnerUID = "";
+                let minDistSoFar = Number.POSITIVE_INFINITY;
+                for (let buddyUid in searchingUsers) {
+                    if (myUid !== buddyUid && searchingUsers[myUid].buddy == null) {
+                        if (searchingUsers.hasOwnProperty(buddyUid) && searchingUsers[buddyUid].buddy == null) {
+                            const buddyStartLat = searchingUsers[buddyUid].startLat;
+                            const buddyStartLong = searchingUsers[buddyUid].startLong;
+                            const buddyDestLat = searchingUsers[buddyUid].destLat;
+                            const buddyDestLong = searchingUsers[buddyUid].destLong;
 
-            let partnerUID = "";
-            let minDistSoFar = Number.POSITIVE_INFINITY;
-            for (let buddyUid in searchingUsers) {
-                if (myUid !== buddyUid && searchingUsers[myUid].buddy == null) {
-                    if (searchingUsers.hasOwnProperty(buddyUid) && searchingUsers[buddyUid].buddy == null) {
-                        const buddyStartLat = searchingUsers[buddyUid].startLat;
-                        const buddyStartLong = searchingUsers[buddyUid].startLong;
-                        const buddyDestLat = searchingUsers[buddyUid].destLat;
-                        const buddyDestLong = searchingUsers[buddyUid].destLong;
-
-                        const startDist = getDist(myStartLat, myStartLong, buddyStartLat, buddyStartLong);
-                        const destDist = getDist(myDestLat, myDestLong, buddyDestLat, buddyDestLong);
-                        const totalDist = startDist + destDist;
-                        if (totalDist < minDistSoFar) {
-                            partnerUID = buddyUid;
-                            minDistSoFar = totalDist;
+                            const startDist = getDist(myStartLat, myStartLong, buddyStartLat, buddyStartLong);
+                            const destDist = getDist(myDestLat, myDestLong, buddyDestLat, buddyDestLong);
+                            const totalDist = startDist + destDist;
+                            if (totalDist < minDistSoFar) {
+                                partnerUID = buddyUid;
+                                minDistSoFar = totalDist;
+                            }
                         }
                     }
                 }
+                // update both the dictionary and the pool
+                searchingUsers[myUid].buddy = partnerUID;
+                // pool.child(myUid).val().buddy = partnerUID;
+                searchingUsers[myUid].status = "pending";
+                // pool.child(myUid).val().status = "pending";
+
+                pool.child(myUid).update({
+                    buddy: partnerUID,
+                    status: "pending"
+                });
+
+                searchingUsers[partnerUID].buddy = myUid;
+                // pool.child(partnerUID).val().buddy = myUid;
+                searchingUsers[partnerUID].status = "pending";
+                // pool.child(partnerUID).val().status = "pending";
+
+                pool.child(partnerUID).update({
+                    buddy: myUid,
+                    status: "pending"
+                });
+
             }
-            // update both the dictionary and the pool
-            searchingUsers[myUid].buddy = partnerUID;
-            pool.child(myUid).val().buddy = partnerUID;
-            searchingUsers[myUid].status = "pending";
-            pool.child(myUid).val().status = "pending";
-
-            searchingUsers[partnerUID].buddy = myUid;
-            pool.child(partnerUID).val().buddy = myUid;
-            searchingUsers[partnerUID].status = "pending";
-            pool.child(partnerUID).val().status = "pending";
-
         }
-    }
+    });
 
     // no return needed because buddy attributes of people updated, so refer to that to find buddy
 }
