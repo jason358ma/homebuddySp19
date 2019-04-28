@@ -269,11 +269,14 @@ async function findBuddy(myUid) {
     let id = setInterval(findBuddyHelper, 1000);
 
     function findBuddyHelper () {
-        let buddyUid = pool.child(myUid).val().buddy;
-        if (buddyUid != null) {
-            buddyName = pool.child(buddyUid).val().firstName + " " + pool.child(buddyUid).val().lastName;
-            clearInterval(id);
-        }
+        let buddyUid = null;
+        pool.child(myUid).once("value").then(function(snapshot){
+            buddyUid = snapshot.val().buddy;
+            if (buddyUid != null) {
+                buddyName = pool.child(buddyUid).val().firstName + " " + pool.child(buddyUid).val().lastName;
+                clearInterval(id);
+            }
+        });
     }
 
     return buddyName;
@@ -281,17 +284,22 @@ async function findBuddy(myUid) {
 
 app.post('/findBuddy', function(req, res) {
     const pool = database.ref('users');
-    const myUid = auth.currentUser.uid;
+    const myUid = currentUserID;
 
-    pool.child(myUid).val().status = "searching";
-    pool.child(myUid).val().buddy = null;
+    pool.child(myUid).update({
+        status: "searching",
+        buddy: null
+        }
+    ).then(function (data) {
+        findBuddy(myUid).then(function(buddyName) {
+            return res.send(buddyName); // frontend might want buddyName to display to user
+        });
+    });
     // do not update searchingUsers because user shouldn't be in there yet
     // no need to add user to searchingUsers because pair() should retrieve it from pool
 
     // see if buddy assigned - async: we don't want to be blocking while checking if buddy assigned to user
-    findBuddy(myUid).then(function(buddyName) {
-        return res.send(buddyName); // frontend might want buddyName to display to user
-    });
+
 });
 
 async function waitForBuddy(buddyUid) {
@@ -330,7 +338,7 @@ function acceptBuddy(myUid, buddyUid) {
 
 app.post('/acceptBuddy', function(req, res) {
     const pool = database.ref('users');
-    const myUid = auth.currentUser.uid;
+    const myUid = currentUserID;
     const buddyUid = pool.child(myUid).val().buddy;
 
     searchingUsers[myUid].status = "not searching";
@@ -344,7 +352,7 @@ app.post('/acceptBuddy', function(req, res) {
 
 app.post('/declineBuddy', function(req, res) {
     const pool = database.ref('users');
-    const myUid = auth.currentUser.uid;
+    const myUid = currentUserID;
 
     searchingUsers[myUid].status = "searching";
     pool.child(myUid).val().status = "searching";
@@ -354,7 +362,7 @@ app.post('/declineBuddy', function(req, res) {
 
 app.post('/stopSearching', function(req, res) {
     const pool = database.ref('users');
-    const myUid = auth.currentUser.uid;
+    const myUid = currentUserID;
 
     delete searchingUsers[myUid];
     pool.child(myUid).val().status = "not searching";
