@@ -75,8 +75,6 @@ app.post('/signup', function(req, res) {
             res.send(errorMessage);
         }
         // [END_EXCLUDE]
-    }).then(function (response) {
-        res.send("signup successful!");
     });
     // [END createwithemail]
     firebase.auth().onAuthStateChanged(function(user) {
@@ -84,7 +82,7 @@ app.post('/signup', function(req, res) {
             // User is signed in.
             let uid = user.uid;
             createChild(uid, req.body.firstName, req.body.lastName);
-            res.send("Signup successful");
+            console.log("Signup successful");
         } else {
             // No user is signed in.
         }
