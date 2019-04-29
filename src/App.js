@@ -18,7 +18,13 @@ class Signup extends Component {
 
     constructor(props) {
       super(props);
-      this.state = {username: 'u', password: 'p', first: 'f', last: 'l'};
+      this.state = {
+        username: 'u',
+        password: 'p',
+        first: 'f',
+        last: 'l',
+        loginSuccess: false
+      };
 
       this.handleChange = this.handleChange.bind(this);
       this.submitClicked= this.submitClicked.bind(this);
@@ -61,13 +67,25 @@ class Signup extends Component {
           password: this.state.password,
       }).then(response => {
           console.log(response.data);
-      })
+          if (response.data === true) { //if response is successful
+            console.log("logging in")
+            //this.setState({loginSuccess : true});
+            return (
+            <Router>
+              <Link to="/Map"></Link>
+              <Route path="/Map/" component={MapContainer} />
+            </Router>
+            )
+          } else {
+            console.log("login unsuccessful")
+          }
+        })
     }
 
   render() {
     return (
       <div className="App">
-      <Router>
+      //<Router>
         <header className="App-header">
           <img src={logo} className="App-logo" alt="logo" />
 
@@ -88,12 +106,12 @@ class Signup extends Component {
       </label>
           <br/>
           <input type="submit" username="Submit" onClick={this.submitClicked}/>
-            <Link to="/Map">
-              <button username="login" id="loginbutton" onClick={this.loginClicked}>LOGIN</button>
-            </Link>
-            <Route path="/Map/" component={MapContainer} />
+            // <Link to="/Map">
+            <button username="login" id="loginbutton" onClick={this.loginClicked}>LOGIN</button>
+            // </Link>
+            // <Route path="/Map/" component={MapContainer} />
         </header>
-        </Router>
+        //</Router>
       </div>
 
     );
