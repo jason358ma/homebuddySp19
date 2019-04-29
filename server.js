@@ -308,7 +308,9 @@ app.post('/findBuddy', function(req, res) {
         }
     ).then(function (data) {
         findBuddy(myUid).then(function(buddyVals) {
-            res.send(buddyVals); // frontend might want buddyName to display to user
+            res.send({
+                buddy: buddyVals
+            }); // frontend might want buddyName to display to user
         });
     });
     // do not update searchingUsers because user shouldn't be in there yet
