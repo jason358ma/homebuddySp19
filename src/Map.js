@@ -141,6 +141,7 @@ export class Map extends React.Component {
         };
         this.pushWaypoint(meetLocation.lat, meetLocation.lng); //add waypoint at midpoint of buddy start locations
         this.pushWaypoint(splitLocation.lat, splitLocation.lng); //add waypoint at midpoint of buddy destinations
+        this.loadMap()
     })
   }
 
