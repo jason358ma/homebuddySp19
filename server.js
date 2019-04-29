@@ -295,7 +295,7 @@ async function findBuddy(myUid) {
         });
     }
 
-    return [buddyVals.firstName, buddyVals.lastName, buddyVals.startLat, buddyVals.startLong, buddyVals.destLat, buddyVals.destLong];
+    return buddyVals;
 }
 
 app.post('/findBuddy', function(req, res) {
@@ -307,8 +307,8 @@ app.post('/findBuddy', function(req, res) {
         buddy: null
         }
     ).then(function (data) {
-        findBuddy(myUid).then(function(buddyArr) {
-            res.send(buddyArr); // frontend might want buddyName to display to user
+        findBuddy(myUid).then(function(buddyVals) {
+            res.send(buddyVals); // frontend might want buddyName to display to user
         });
     });
     // do not update searchingUsers because user shouldn't be in there yet
