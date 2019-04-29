@@ -282,18 +282,20 @@ async function findBuddy(myUid) {
 
     let buddyVals = null;
     // busy wait here instead using while loop
-    while (buddyVals == null) {
-        pool.child(myUid).once("value").then(function(snapshot){
-            let buddyUid = snapshot.val().buddy;
-            if (buddyUid != null) {
-                pool.child(buddyUid).once("value").then(function(buddySnapshot) {
-                    buddyVals = buddySnapshot.val();
-                });
-            }
-        });
-    }
-
-    return buddyVals;
+    pool.child(myUid).once("value").then(function(snapshot){
+        let buddyUid = snapshot.val().buddy;
+        if (buddyUid != null) {
+            pool.child(buddyUid).once("value").then(function(buddySnapshot) {
+                buddyVals = buddySnapshot.val();
+            });
+        }
+    }).then(function () {
+        if (buddyVals === null) {
+            setTimeout(findBuddy, 1000, myUid);
+        } else {
+            return buddyVals;
+        }
+    });
 }
 
 app.post('/findBuddy', function(req, res) {
