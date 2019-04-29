@@ -304,7 +304,7 @@ async function findBuddy(myUid) {
 
 app.post('/findBuddy', function(req, res) {
     const pool = database.ref('users');
-    const myUid = currentUserID;
+    const myUid = auth.currentUser.uid; //currentUserID;
 
     pool.child(myUid).update({
         status: "searching",
