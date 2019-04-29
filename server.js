@@ -291,7 +291,7 @@ async function findBuddy(myUid) {
         }
     }).then(function () {
         if (buddyVals === null) {
-            setTimeout(findBuddy, 1000, myUid);
+            setTimeout(findBuddy, 500, myUid);
         } else {
             return buddyVals;
         }
@@ -308,20 +308,22 @@ app.post('/findBuddy', function(req, res) {
         }
     ).then(function (data) {
         findBuddy(myUid).then(function(buddyVals) {
-            pool.child(myUid).once("value").then(function(snapshot){
-                let buddyUid = snapshot.val().buddy;
-                if (buddyUid != null) {
-                    pool.child(buddyUid).once("value").then(function(buddySnapshot) {
-                        let buddyVals = buddySnapshot.val();
-                        res.send({
-                            buddy: buddyVals
-                        }); // frontend might want buddyName to display to user
+            setTimeout(function() {
+                pool.child(myUid).once("value").then(function(snapshot){
+                    let buddyUid = snapshot.val().buddy;
+                    if (buddyUid != null) {
+                        pool.child(buddyUid).once("value").then(function(buddySnapshot) {
+                            let buddyVals = buddySnapshot.val();
+                            res.send({
+                                buddy: buddyVals
+                            }); // frontend might want buddyName to display to user
 
-                    });
-                } else {
-                    res.send("no buddy!")
-                }
-            });
+                        });
+                    } else {
+                        res.send("no buddy!")
+                    }
+                });
+            }, 5000)
         });
     });
     // do not update searchingUsers because user shouldn't be in there yet
