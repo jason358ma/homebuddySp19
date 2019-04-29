@@ -315,18 +315,14 @@ app.post('/findBuddy', function(req, res) {
                         if (buddyUid != null) {
                             pool.child(buddyUid).once("value").then(function(buddySnapshot) {
                                 let buddyVals = buddySnapshot.val();
-                                resolve(buddyVals)
+                                res.send(buddyVals); // frontend might want buddyName to display to user
 
                             });
                         } else {
-                            resolve('no buddy!')
+                            res.send("no buddy!")
                         }
                     });
                 }, 5000)
-            })
-
-            promise().then(function (val) {
-                res.send(val)
             })
         });
     });
