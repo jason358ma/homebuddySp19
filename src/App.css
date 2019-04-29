@@ -2,6 +2,8 @@
   text-align: center;
   width: 100vw;
   height: 100vh;
+  display: flex;
+  align-content: space-between;
 }
 
 .App-logo {
@@ -10,8 +12,25 @@
   pointer-events: none;
 }
 
+.landing {
+    width: 50vw;
+    min-height: 100vh;
+    background-color: #131B33;
+    justify-content: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    font-size: calc(10px + 2vmin);
+    color: white;
+    font-weight: 400;
+    width: 40vw;
+    font-family: 'Roboto','sans-serif';
+    padding: 0 4% 0 8%;
+
+}
+
 .App-header {
-  background-color: #282c34;
+  background-color: #131B33;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
@@ -19,11 +38,40 @@
   justify-content: center;
   font-size: calc(10px + 2vmin);
   color: white;
+  width: 60vw;
+
 }
 
-.App-link {
-  color: #61dafb;
+#logo {
+    font-family: 'Avenir Next';
+    /*font-size: 60pt*/
+    font-size: calc(12px + 10vmin);
 }
+#subhead {
+    line-height: 1.5em
+}
+
+#icon-div {
+    width: 100%;
+    /*background-color: #888888;*/
+}
+
+.signin-box {
+    margin-bottom: 10%;
+    color: #000000;
+    background-color: #E6E6E6;
+    width: 60%;
+    font-family: 'Roboto','sans-serif';
+    padding: 0 7% 7% 4%;
+    line-height: 1.2em;
+
+}
+
+.signin-item {
+    width: 100%;
+    text-align: left;
+}
+
 
 #loginbutton {
     top: 0px;

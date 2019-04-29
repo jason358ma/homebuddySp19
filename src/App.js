@@ -14,17 +14,31 @@ import axios from 'axios';
 import ReactDOM from 'react-dom';
 // import * as ReactDOM from 'react-dom'
 
+const inputStyle = {
+  fontSize: '18pt',
+  width: '100%',
+};
+
+const buttonStyle = {
+    fontSize: '18pt',
+    width: '30%'
+
+};
+
 class Signup extends Component {
 
     constructor(props) {
-      super(props);
-      this.state = {
-        username: 'u',
-        password: 'p',
-        first: 'f',
-        last: 'l',
-        loginSuccess: false
-      };
+
+          super(props);
+          this.state = {
+            username: 'u',
+            password: 'p',
+            first: 'f',
+            last: 'l',
+            loginSuccess: false
+          };
+
+
 
       this.handleChange = this.handleChange.bind(this);
       this.submitClicked= this.submitClicked.bind(this);
@@ -48,7 +62,7 @@ class Signup extends Component {
     }
 
     submitClicked = () => {
-        alert('submit clicked!')
+        alert('Signed up!')
         console.log(this.state)
 
         axios.post("/signup", {
@@ -80,39 +94,76 @@ class Signup extends Component {
     }
 
   render() {
-    console.log(this.state.loginSuccess);
     if (this.state.loginSuccess === true) {
       return (
         <MapContainer/>
       );
     } else {
-      return (
-        <div className="App">
-          <header className="App-header">
-            <img src={logo} className="App-logo" alt="logo" />
+    return (
+      <div className="App">
+      { /*<Router> */}
+          <div className="landing">
+            <div id="logo"> home<b>buddy</b></div>
 
-              <label> Username:
-              <input type="text" id="username" username={this.state.username} onChange={this.handleChange} />
-            </label>
+            <div id="icon-div">
+                <p> </p>
+            </div>
+            <p id="subhead"> Homebuddy matches students with a buddy who lives near their destination, so that both people can walk home together safely. </p>
+          </div>
 
-            <label> Password:
-            <input type="text" id="password" password={this.state.password} onChange={this.handleChange} />
-            </label>
 
-            <label> First:
-            <input type="text" id="first" first={this.state.first} onChange={this.handleChange} />
-          </label>
+        <header className="App-header">
+        { /*  <img src={logo} className="App-logo" alt="logo" /  */}
+            <div className="signin-box">
 
-          <label> Last:
-          <input type="text" id="last" last={this.state.last} onChange={this.handleChange} />
-        </label>
-            <br/>
-            <input type="submit" username="Submit" onClick={this.submitClicked}/>
-            <button username="login" id="loginbutton" onClick={this.loginClicked}>LOGIN</button>
-          </header>
-        </div>
-      );
-    }
+                <h2> Log in to request a pairing </h2>
+
+                <div className="signin-item">
+                  <label> email address <br/>
+                    <input style={inputStyle} type="text" id="username"  username={this.state.username} onChange={this.handleChange} />
+                  </label>
+                 </div>
+
+                  <div className="signin-item">
+                      <label> password <br/>
+                      <input style={inputStyle} type="text" id="password" password={this.state.password} onChange={this.handleChange} />
+                      </label>
+                  </div>
+
+                  <div className="signin-item">
+
+                        <button style={buttonStyle} username="login" id="loginbutton" onClick={this.loginClicked}>sign in</button>
+                        {/* </Link>
+                        <Route path="/Map/" component={MapContainer} /> */ }
+                  </div>
+
+
+                  <p> To create an account, fill out the following items as well </p>
+                  <div className="signin-item">
+                      <label> first name<br/>
+                      <input style={inputStyle} type="text" id="first" first={this.state.first} onChange={this.handleChange} />
+                      </label>
+                  </div>
+
+                  <div className="signin-item">
+                      <label> last name<br/>
+                      <input style={inputStyle} type="text" id="last" last={this.state.last} onChange={this.handleChange} />
+                      </label>
+                  </div>
+
+                  <div className="signin-item">
+
+                      <input style={buttonStyle} type="submit" username="Submit" value="sign up" onClick={this.submitClicked}/>
+                        {/* <Link to="/Map"> */}
+                  </div>
+            </div>
+
+        </header>
+        { /*</Router> */}
+      </div>
+
+    );
+  }
   }
 }
 
