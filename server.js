@@ -308,22 +308,26 @@ app.post('/findBuddy', function(req, res) {
         }
     ).then(function (data) {
         findBuddy(myUid).then(function(buddyVals) {
-            setTimeout(function() {
-                pool.child(myUid).once("value").then(function(snapshot){
-                    let buddyUid = snapshot.val().buddy;
-                    if (buddyUid != null) {
-                        pool.child(buddyUid).once("value").then(function(buddySnapshot) {
-                            let buddyVals = buddySnapshot.val();
-                            res.send({
-                                buddy: buddyVals
-                            }); // frontend might want buddyName to display to user
+            var promise = new Promise(function (resolve, reject) {
+                setTimeout(function() {
+                    pool.child(myUid).once("value").then(function(snapshot){
+                        let buddyUid = snapshot.val().buddy;
+                        if (buddyUid != null) {
+                            pool.child(buddyUid).once("value").then(function(buddySnapshot) {
+                                let buddyVals = buddySnapshot.val();
+                                resolve(buddyVals)
 
-                        });
-                    } else {
-                        res.send("no buddy!")
-                    }
-                });
-            }, 5000)
+                            });
+                        } else {
+                            resolve('no buddy!')
+                        }
+                    });
+                }, 5000)
+            })
+
+            promise().then(function (val) {
+                res.send(val)
+            })
         });
     });
     // do not update searchingUsers because user shouldn't be in there yet
