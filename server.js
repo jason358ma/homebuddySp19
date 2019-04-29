@@ -295,7 +295,7 @@ async function findBuddy(myUid) {
         });
     }
 
-    return [buddyVals.firstName, buddyVals.lastName, buddyVals.startLat, buddyVals.startLong];
+    return [buddyVals.firstName, buddyVals.lastName, buddyVals.startLat, buddyVals.startLong, buddyVals.destLat, buddyVals.destLong];
 }
 
 app.post('/findBuddy', function(req, res) {
