@@ -130,7 +130,17 @@ export class Map extends React.Component {
   getBuddy = () => {
     axios.post("/findBuddy", {
     }).then(response => {
-        console.log("buddy name: " + response.data);
+        alert('You are meeting up with ' + response.data.firstName + response.data.lastName);
+        var meetLocation = {
+          lat: (this.state.currentLocation.lat + response.data.startLat) / 2,
+          lng: (this.state.currentLocation.lng + response.data.startLong) / 2
+        };
+        var splitLocation = {
+          lat: (this.state.destination.lat + response.data.destLat) / 2,
+          lng: (this.state.destination.lng + response.data.destLong) / 2
+        };
+        this.pushWaypoint(meetLocation.lat, meetLocation.lng); //add waypoint at midpoint of buddy start locations
+        this.pushWaypoint(splitLocation.lat, splitLocation.lng); //add waypoint at midpoint of buddy destinations
     })
   }
 
@@ -233,6 +243,7 @@ export class Map extends React.Component {
                   }, () => {
                       console.log("STATE")
                       console.log(this.state)
+                      alert('Destination set!')
 
                       axios.post("/coordinates", {
                           startLat: this.state.currentLocation.lat,
@@ -242,7 +253,7 @@ export class Map extends React.Component {
                       }).then(response => {
                           console.log(response.data);
                       })
-                      this.pushWaypoint(37.4275, -122.1697) //stanford
+                      //this.pushWaypoint(37.4275, -122.1697) //stanford
                       this.loadMap()
                   });
               }
