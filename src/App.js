@@ -62,59 +62,57 @@ class Signup extends Component {
     }
 
     loginClicked = () => {
+      this.setState({loginSuccess : true})
+      this.forceUpdate();
       axios.post("/signin", {
           email: this.state.username,
           password: this.state.password,
       }).then(response => {
           console.log(response.data);
           if (response.data === true) { //if response is successful
-            console.log("logging in")
-            //this.setState({loginSuccess : true});
-            return (
-            <Router>
-              <Link to="/Map"></Link>
-              <Route path="/Map/" component={MapContainer} />
-            </Router>
-            )
+            alert('Logging in!')
+            this.setState({loginSuccess : true})
           } else {
-            console.log("login unsuccessful")
+            alert('Login Unsuccessful')
+            this.setState({loginSuccess : false})
           }
         })
     }
 
   render() {
-    return (
-      <div className="App">
-      //<Router>
-        <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
+    console.log(this.state.loginSuccess);
+    if (this.state.loginSuccess === true) {
+      return (
+        <MapContainer/>
+      );
+    } else {
+      return (
+        <div className="App">
+          <header className="App-header">
+            <img src={logo} className="App-logo" alt="logo" />
 
-            <label> Username:
-            <input type="text" id="username" username={this.state.username} onChange={this.handleChange} />
+              <label> Username:
+              <input type="text" id="username" username={this.state.username} onChange={this.handleChange} />
+            </label>
+
+            <label> Password:
+            <input type="text" id="password" password={this.state.password} onChange={this.handleChange} />
+            </label>
+
+            <label> First:
+            <input type="text" id="first" first={this.state.first} onChange={this.handleChange} />
           </label>
 
-          <label> Password:
-          <input type="text" id="password" password={this.state.password} onChange={this.handleChange} />
-          </label>
-
-          <label> First:
-          <input type="text" id="first" first={this.state.first} onChange={this.handleChange} />
+          <label> Last:
+          <input type="text" id="last" last={this.state.last} onChange={this.handleChange} />
         </label>
-
-        <label> Last:
-        <input type="text" id="last" last={this.state.last} onChange={this.handleChange} />
-      </label>
-          <br/>
-          <input type="submit" username="Submit" onClick={this.submitClicked}/>
-            // <Link to="/Map">
+            <br/>
+            <input type="submit" username="Submit" onClick={this.submitClicked}/>
             <button username="login" id="loginbutton" onClick={this.loginClicked}>LOGIN</button>
-            // </Link>
-            // <Route path="/Map/" component={MapContainer} />
-        </header>
-        //</Router>
-      </div>
-
-    );
+          </header>
+        </div>
+      );
+    }
   }
 }
 
