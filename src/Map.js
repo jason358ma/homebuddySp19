@@ -94,6 +94,7 @@ export class Map extends React.Component {
           lat: 37.868112,
           lng: -122.255033
       },
+      waypoints: [],
       directionsService : directionsService,
       directionsDisplay : directionsDisplay,
       searchBox : searchBox,
@@ -131,6 +132,17 @@ export class Map extends React.Component {
     }).then(response => {
         console.log("buddy name: " + response.data);
     })
+  }
+
+  pushWaypoint = (latitude, longitude) => {
+    this.state.waypoints.push({
+      location: {
+        lat: latitude,
+        lng: longitude
+      },
+      stopover: true
+    })
+    //console.log(this.state)
   }
 
   loadMap = () => {
@@ -230,7 +242,7 @@ export class Map extends React.Component {
                       }).then(response => {
                           console.log(response.data);
                       })
-
+                      this.pushWaypoint(37.4275, -122.1697) //stanford
                       this.loadMap()
                   });
               }
@@ -270,6 +282,7 @@ displayRoute(destination) { //display route from current location to specified d
     this.state.directionsService.route({
         origin: new this.props.google.maps.LatLng(this.state.currentLocation.lat, this.state.currentLocation.lng),
         destination: new this.props.google.maps.LatLng(destination.lat, destination.lng),
+        waypoints: this.state.waypoints,
         travelMode: this.props.google.maps.TravelMode['WALKING']
         }, (response, status) => {
             if (status === 'OK') {
@@ -302,7 +315,6 @@ displayRoute(destination) { //display route from current location to specified d
     console.log("children: " + children);
 
     if (!children) return;
-
 
     return React.Children.map(children, c => {
       if (!c) return;
