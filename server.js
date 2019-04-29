@@ -159,7 +159,7 @@ app.post("/passwordReset", function(req, res) {
 
 app.post('/coordinates', function (req, res) {
     const ref = database.ref('users');
-    const uid = currentUserID;
+    const uid = firebase.auth().currentUser.uid; //currentUserID;
     ref.child(uid).update({
         startLat: req.body.startLat,
         startLong: req.body.startLong,
@@ -304,7 +304,7 @@ async function findBuddy(myUid) {
 
 app.post('/findBuddy', function(req, res) {
     const pool = database.ref('users');
-    const myUid = auth.currentUser.uid; //currentUserID;
+    const myUid = firebase.auth().currentUser.uid; //currentUserID;
 
     pool.child(myUid).update({
         status: "searching",
