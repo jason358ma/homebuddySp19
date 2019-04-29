@@ -139,8 +139,8 @@ export class Map extends React.Component {
           lat: (this.state.destination.lat + response.data.destLat) / 2,
           lng: (this.state.destination.lng + response.data.destLong) / 2
         };
-        this.pushWaypoint(meetLocation.lat, meetLocation.lng); //add waypoint at midpoint of buddy start locations
-        this.pushWaypoint(splitLocation.lat, splitLocation.lng); //add waypoint at midpoint of buddy destinations
+        this.pushWaypoint(meetLocation.lat, -1 * meetLocation.lng); //add waypoint at midpoint of buddy start locations
+        this.pushWaypoint(splitLocation.lat, -1 * splitLocation.lng); //add waypoint at midpoint of buddy destinations
         this.loadMap()
     })
   }
