@@ -290,7 +290,11 @@ async function findBuddy(myUid) {
             });
         }
     }).then(function () {
-        return buddyVals
+        if (buddyVals === null) {
+            setTimeout(findBuddy, 1000, myUid);
+        } else {
+            return buddyVals;
+        }
     });
 }
 
@@ -303,18 +307,22 @@ app.post('/findBuddy', function(req, res) {
         buddy: null
         }
     ).then(function (data) {
-        let buddyVals = null;
+        findBuddy(myUid).then(function(buddyVals) {
+            pool.child(myUid).once("value").then(function(snapshot){
+                let buddyUid = snapshot.val().buddy;
+                if (buddyUid != null) {
+                    pool.child(buddyUid).once("value").then(function(buddySnapshot) {
+                        let buddyVals = buddySnapshot.val();
+                        res.send({
+                            buddy: buddyVals
+                        }); // frontend might want buddyName to display to user
 
-        while (buddyVals === null) {
-            findBuddy(myUid).then(function(vals) {
-                buddyVals = vals;
-                if (buddyVals === null) {
-                    setTimeout(findBuddy, 1000, myUid);
+                    });
                 } else {
-                    return buddyVals;
+                    res.send("no buddy!")
                 }
             });
-        }
+        });
     });
     // do not update searchingUsers because user shouldn't be in there yet
     // no need to add user to searchingUsers because pair() should retrieve it from pool
