@@ -39,23 +39,27 @@ app.get('/ping', function (req, res) {
 function createChild(uid, firstName, lastName) {
     const database = firebase.database();
     const ref = database.ref('users')
-    ref.child(uid).set({
-        // https://scotch.io/tutorials/use-expressjs-to-get-url-and-post-parameters
-        firstName: firstName,
-        lastName: lastName,
-        startLat: null,
-        startLong: null,
-        destLat: null,
-        destLong: null,
-        status: "not searching", // searching, pending, not searching
-        buddy: null
-        // searching + buddy not null = not possible
-        // searching + buddy null = in searchingUsers, waiting for match
-        // pending + buddy not null = buddy assigned but no user decision of accept or reject
-        // pending + buddy null = not possible
-        // not searching + buddy not null = buddy found already, not in searchingUsers
-        // not searching + buddy null = in pool and not searching, just logged in, not in searchingUsers
-    });
+    ref.once("value").then(function(snapshot) {
+        if (!snapshot.hasChild(uid)) {
+            ref.child(uid).set({
+                // https://scotch.io/tutorials/use-expressjs-to-get-url-and-post-parameters
+                firstName: firstName,
+                lastName: lastName,
+                startLat: null,
+                startLong: null,
+                destLat: null,
+                destLong: null,
+                status: "not searching", // searching, pending, not searching
+                buddy: null
+                // searching + buddy not null = not possible
+                // searching + buddy null = in searchingUsers, waiting for match
+                // pending + buddy not null = buddy assigned but no user decision of accept or reject
+                // pending + buddy null = not possible
+                // not searching + buddy not null = buddy found already, not in searchingUsers
+                // not searching + buddy null = in pool and not searching, just logged in, not in searchingUsers
+            });
+        }
+    })
 }
 
 app.get('/', function(req, res) {
