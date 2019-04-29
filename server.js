@@ -109,7 +109,7 @@ app.post('/signin', function(req, res) {
         .then(function(data) {
             console.log("Login success!");
             console.log(data);
-            res.send(data);
+            res.send(true);
         })
         .catch(function(error) {
             // Handle Errors here.
